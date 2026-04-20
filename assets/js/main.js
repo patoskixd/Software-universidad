@@ -4,7 +4,7 @@
 const API_URL = 'api/solicitudes.php';
 
 // referencias a los modales Bootstrap, se inicializan en DOMContentLoaded
-let modalNueva, modalEstado, modalDetalle;
+let modalEstado, modalDetalle;
 
 let filtrosActivos = {};
 let solicitudesActuales = [];
@@ -219,13 +219,13 @@ async function verDetalle(id) {
 function abrirModalEstado(id, nombre, estadoActual, observacionesAnteriores) {
     document.getElementById('updateId').value = id;
     document.getElementById('updateNombreDisplay').textContent = nombre;
-    
+
     const selEstado = document.getElementById('updateEstado');
     selEstado.value = estadoActual;
-    
+
     const areaObs = document.getElementById('updateObservaciones');
     areaObs.value = observacionesAnteriores ?? '';
-    
+
     // Disparar evento change manualmente para ocultar/mostrar el contenedor
     selEstado.dispatchEvent(new Event('change'));
 
@@ -260,65 +260,12 @@ async function guardarEstado(e) {
     }
 }
 
-async function enviarNuevaSolicitud(e) {
-    e.preventDefault();
-
-    const form = document.getElementById('formNuevaSolicitud');
-    const errBox = document.getElementById('erroresNueva');
-    const btn = document.getElementById('btnEnviarSolicitud');
-
-    errBox.classList.add('d-none');
-    errBox.querySelector('.lista-errores').innerHTML = '';
-
-    const payload = {
-        nombre_solicitante: form.nombre_solicitante.value.trim(),
-        correo_electronico: form.correo_electronico.value.trim(),
-        tipo_solicitud: form.tipo_solicitud.value,
-        descripcion: form.descripcion.value.trim(),
-    };
-
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Enviando…';
-
-    try {
-        await fetchJSON(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-        });
-        modalNueva.hide();
-        form.reset();
-        mostrarAlerta('success', 'Solicitud registrada exitosamente.');
-        await cargarSolicitudes(filtrosActivos);
-    } catch (err) {
-        const lista = errBox.querySelector('.lista-errores');
-        (err.messages ?? ['Error al registrar la solicitud.']).forEach(m => {
-            const li = document.createElement('li');
-            li.textContent = m;
-            lista.appendChild(li);
-        });
-        errBox.classList.remove('d-none');
-    } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<i class="bi bi-send me-1"></i> Enviar Solicitud';
-    }
-}
 
 document.addEventListener('DOMContentLoaded', () => {
-    modalNueva = new bootstrap.Modal(document.getElementById('modalNuevaSolicitud'));
     modalEstado = new bootstrap.Modal(document.getElementById('modalActualizarEstado'));
     modalDetalle = new bootstrap.Modal(document.getElementById('modalDetalle'));
 
-    document.getElementById('formNuevaSolicitud').addEventListener('submit', enviarNuevaSolicitud);
     document.getElementById('formActualizarEstado').addEventListener('submit', guardarEstado);
-
-    // Resetear el formulario y los errores cuando se cierra el modal
-    document.getElementById('modalNuevaSolicitud').addEventListener('hidden.bs.modal', () => {
-        const errBox = document.getElementById('erroresNueva');
-        errBox.classList.add('d-none');
-        errBox.querySelector('.lista-errores').innerHTML = '';
-        document.getElementById('formNuevaSolicitud').reset();
-    });
 
     // Un solo listener en el contenedor padre para manejar la tabla (desktop) y las tarjetas (mobile) simultáneamente
     document.getElementById('solicitudesContainer').addEventListener('click', e => {

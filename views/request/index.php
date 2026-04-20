@@ -7,23 +7,15 @@
         <circle cx="140" cy="0" r="55" fill="white" />
         <circle cx="180" cy="80" r="40" fill="white" />
     </svg>
-    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3"
-        style="position:relative;z-index:1;">
-        <div>
-            <h4 class="mb-1 fw-bold d-flex align-items-center gap-2">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                    <path
-                        d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-1 14H5c-.55 0-1-.45-1-1V7c0-.55.45-1 1-1h14c.55 0 1 .45 1 1v10c0 .55-.45 1-1 1zM6 10h2v2H6zm0 4h8v2H6zm10 0h2v2h-2zm-6-4h8v2h-8z" />
-                </svg>
-                Gestión de Solicitudes
-            </h4>
-            <small class="text-white-50" id="totalCount">Cargando…</small>
-        </div>
-        <button class="btn btn-sm px-3 fw-semibold"
-            style="background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.28);color:#fff;"
-            data-bs-toggle="modal" data-bs-target="#modalNuevaSolicitud">
-            <i class="bi bi-plus-lg me-1"></i> Nueva Solicitud
-        </button>
+    <div style="position:relative;z-index:1;">
+        <h4 class="mb-1 fw-bold d-flex align-items-center gap-2">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                    d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-1 14H5c-.55 0-1-.45-1-1V7c0-.55.45-1 1-1h14c.55 0 1 .45 1 1v10c0 .55-.45 1-1 1zM6 10h2v2H6zm0 4h8v2H6zm10 0h2v2h-2zm-6-4h8v2h-8z" />
+            </svg>
+            Gestión de Solicitudes
+        </h4>
+        <small class="text-white-50" id="totalCount">Cargando…</small>
     </div>
 </div>
 
@@ -152,69 +144,6 @@
     </div>
 </div>
 
-
-<!--  Modal de nueva solicitud  -->
-<div class="modal fade" id="modalNuevaSolicitud" tabindex="-1" aria-labelledby="modalNuevaSolicitudLabel">
-    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="modalNuevaSolicitudLabel">
-                    <i class="bi bi-file-earmark-plus me-2"></i>Nueva Solicitud
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"
-                    onclick="this.blur()"></button>
-            </div>
-            <form id="formNuevaSolicitud" novalidate>
-                <div class="modal-body">
-                    <div class="alert alert-danger d-none" id="erroresNueva">
-                        <strong><i class="bi bi-exclamation-triangle-fill me-1"></i> Corrija los siguientes
-                            errores:</strong>
-                        <ul class="lista-errores mb-0 mt-1"></ul>
-                    </div>
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label for="inputNombre" class="form-label">Nombre completo <span
-                                    class="text-danger">*</span></label>
-                            <input type="text" id="inputNombre" name="nombre_solicitante" class="form-control"
-                                maxlength="150" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="inputCorreo" class="form-label">Correo electrónico <span
-                                    class="text-danger">*</span></label>
-                            <input type="email" id="inputCorreo" name="correo_electronico" class="form-control"
-                                maxlength="150" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="inputTipo" class="form-label">Tipo de solicitud <span
-                                    class="text-danger">*</span></label>
-                            <select id="inputTipo" name="tipo_solicitud" class="form-select" required>
-                                <option value="">Seleccione…</option>
-                                <option value="academica">Académica</option>
-                                <option value="certificado">Certificado</option>
-                                <option value="actualizacion_datos">Actualización de Datos</option>
-                                <option value="otra">Otra</option>
-                            </select>
-                        </div>
-                        <div class="col-12">
-                            <label for="inputDescripcion" class="form-label">Descripción <span
-                                    class="text-danger">*</span></label>
-                            <textarea id="inputDescripcion" name="descripcion" class="form-control" rows="4"
-                                placeholder="Describa su solicitud con el mayor detalle posible…" required></textarea>
-                            <div class="form-text">Mínimo 10 caracteres.</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                        onclick="this.blur()">Cancelar</button>
-                    <button type="submit" id="btnEnviarSolicitud" class="btn btn-primary">
-                        <i class="bi bi-send me-1"></i> Enviar Solicitud
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 
 
 <!--  Modal de atualizar estado  -->

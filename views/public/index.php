@@ -1,6 +1,4 @@
-<div class="row justify-content-center g-4">
-    <div class="col-lg-8">
-        <div class="card shadow-sm overflow-hidden">
+<div class="card shadow-sm overflow-hidden mb-4">
 
             <!-- Hero -->
             <div class="form-hero" style="position:relative;overflow:hidden;">
@@ -96,14 +94,10 @@
                 </form>
 
             </div>
-        </div>
-    </div>
 </div>
 
 <!-- Consultar estado -->
-<div class="row justify-content-center mt-2">
-    <div class="col-lg-8">
-        <div class="card shadow-sm overflow-hidden">
+<div class="card shadow-sm overflow-hidden">
 
             <div class="form-hero" style="position:relative;overflow:hidden;padding:1.75rem 2rem;">
                 <svg style="position:absolute;top:0;right:0;height:100%;opacity:.08;pointer-events:none;"
@@ -141,9 +135,8 @@
 
             <div id="consultaResultados"></div>
 
-        </div>
-    </div>
 </div>
+
 
 <!-- Modal ver descripcion -->
 <div class="modal fade" id="modalVerDescripcion" tabindex="-1" aria-labelledby="modalVerDescripcionLabel">
