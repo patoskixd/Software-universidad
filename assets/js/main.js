@@ -35,6 +35,7 @@ async function fetchJSON(url, options = {}) {
 
 function renderTabla(solicitudes) {
     const tbody = document.getElementById('solicitudesTableBody');
+    const mbody = document.getElementById('solicitudesMobileBody');
     if (!solicitudes.length) {
         tbody.innerHTML = `
             <tr>
@@ -43,9 +44,20 @@ function renderTabla(solicitudes) {
                     No se encontraron solicitudes con los filtros aplicados.
                 </td>
             </tr>`;
+        if (mbody) {
+            mbody.innerHTML = `
+                <div class="text-center text-muted py-5 bg-white border-bottom">
+                    <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                    No se encontraron solicitudes.
+                </div>`;
+        }
         return;
     }
+    
     tbody.innerHTML = solicitudes.map(buildTableRow).join('');
+    if (mbody) {
+        mbody.innerHTML = solicitudes.map(buildMobileCard).join('');
+    }
 }
 
 // Pide el total de cada estado por separado para mostrar en las tarjetas
@@ -292,8 +304,8 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('formNuevaSolicitud').reset();
     });
 
-    // Un solo listener en el tbody para no tener que re-bindearlo al paginar
-    document.getElementById('solicitudesTableBody').addEventListener('click', e => {
+    // Un solo listener en el contenedor padre para manejar la tabla (desktop) y las tarjetas (mobile) simultáneamente
+    document.getElementById('solicitudesContainer').addEventListener('click', e => {
         const btnDetalle = e.target.closest('.btn-ver-detalle');
         if (btnDetalle) {
             verDetalle(parseInt(btnDetalle.dataset.id, 10));

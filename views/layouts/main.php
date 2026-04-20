@@ -87,7 +87,7 @@
         crossorigin="anonymous"
     ></script>
     <?php foreach ($pageScripts ?? [] as $script): ?>
-        <script src="<?= htmlspecialchars($script) ?>"></script>
+        <script src="<?= htmlspecialchars($script) ?>?v=<?= time() ?>"></script>
     <?php endforeach; ?>
 </body>
 </html>

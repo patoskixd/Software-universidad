@@ -104,9 +104,10 @@
 </div>
 
 <!-- Tabla -->
-<div class="card">
+<div class="card" id="solicitudesContainer">
     <div class="card-body p-0">
-        <div class="table-responsive">
+        <!-- Vista Escritorio -->
+        <div class="table-responsive d-none d-md-block">
             <table class="table table-hover align-middle mb-0">
                 <thead>
                     <tr>
@@ -116,13 +117,13 @@
                         <th class="sortable user-select-none" data-sort="nombre_solicitante" title="Ordenar por Solicitante">
                             Solicitante <i class="bi bi-arrow-down-up text-muted ms-1 sort-icon" style="font-size:.7rem;"></i>
                         </th>
-                        <th class="sortable user-select-none d-none d-md-table-cell" data-sort="tipo_solicitud" title="Ordenar por Tipo">
+                        <th class="sortable user-select-none" data-sort="tipo_solicitud" title="Ordenar por Tipo">
                             Tipo <i class="bi bi-arrow-down-up text-muted ms-1 sort-icon" style="font-size:.7rem;"></i>
                         </th>
                         <th class="sortable user-select-none" data-sort="estado" title="Ordenar por Estado">
                             Estado <i class="bi bi-arrow-down-up text-muted ms-1 sort-icon" style="font-size:.7rem;"></i>
                         </th>
-                        <th class="sortable user-select-none d-none d-lg-table-cell" data-sort="fecha_creacion" title="Ordenar por Fecha">
+                        <th class="sortable user-select-none" data-sort="fecha_creacion" title="Ordenar por Fecha">
                             Fecha <i class="bi bi-arrow-down-up text-muted ms-1 sort-icon" style="font-size:.7rem;"></i>
                         </th>
                         <th class="text-center pe-3">Acciones</th>
@@ -132,6 +133,9 @@
                 </tbody>
             </table>
         </div>
+        
+        <!-- Vista Móvil -->
+        <div class="d-md-none" id="solicitudesMobileBody"></div>
 
         <!-- Paginación -->
         <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2 p-3 border-top bg-light">
@@ -145,14 +149,14 @@
 
 
 <!-- ===== Modal: Nueva Solicitud ===== -->
-<div class="modal fade" id="modalNuevaSolicitud" tabindex="-1" aria-labelledby="modalNuevaSolicitudLabel" aria-hidden="true">
+<div class="modal fade" id="modalNuevaSolicitud" tabindex="-1" aria-labelledby="modalNuevaSolicitudLabel">
     <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title" id="modalNuevaSolicitudLabel">
                     <i class="bi bi-file-earmark-plus me-2"></i>Nueva Solicitud
                 </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar" onclick="this.blur()"></button>
             </div>
             <form id="formNuevaSolicitud" novalidate>
                 <div class="modal-body">
@@ -188,7 +192,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="this.blur()">Cancelar</button>
                     <button type="submit" id="btnEnviarSolicitud" class="btn btn-primary">
                         <i class="bi bi-send me-1"></i> Enviar Solicitud
                     </button>
@@ -200,14 +204,14 @@
 
 
 <!-- ===== Modal: Actualizar Estado ===== -->
-<div class="modal fade" id="modalActualizarEstado" tabindex="-1" aria-labelledby="modalActualizarEstadoLabel" aria-hidden="true">
+<div class="modal fade" id="modalActualizarEstado" tabindex="-1" aria-labelledby="modalActualizarEstadoLabel">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="modalActualizarEstadoLabel">
                     <i class="bi bi-pencil-square me-2 text-primary"></i>Actualizar Estado
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar" onclick="this.blur()"></button>
             </div>
             <form id="formActualizarEstado">
                 <div class="modal-body">
@@ -227,7 +231,7 @@
                     </select>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="this.blur()">Cancelar</button>
                     <button type="submit" id="btnGuardarEstado" class="btn btn-primary">
                         <i class="bi bi-check-lg me-1"></i> Guardar Cambio
                     </button>
@@ -239,18 +243,18 @@
 
 
 <!-- ===== Modal: Ver Detalle ===== -->
-<div class="modal fade" id="modalDetalle" tabindex="-1" aria-labelledby="modalDetalleLabel" aria-hidden="true">
+<div class="modal fade" id="modalDetalle" tabindex="-1" aria-labelledby="modalDetalleLabel">
     <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="modalDetalleLabel">
                     <i class="bi bi-file-text me-2 text-primary"></i>Detalle de Solicitud
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar" onclick="this.blur()"></button>
             </div>
             <div class="modal-body" id="detalleContenido"></div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="this.blur()">Cerrar</button>
             </div>
         </div>
     </div>

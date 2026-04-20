@@ -3,17 +3,17 @@
 
 // Etiquetas legibles para los valores de la BD
 const LABELS_TIPO = {
-    academica:           'Académica',
-    certificado:         'Certificado',
+    academica: 'Académica',
+    certificado: 'Certificado',
     actualizacion_datos: 'Actualización de Datos',
-    otra:                'Otra',
+    otra: 'Otra',
 };
 
 const BADGE_ESTADO = {
-    pendiente:   { cls: 'bg-secondary',        label: 'Pendiente'   },
+    pendiente: { cls: 'bg-secondary', label: 'Pendiente' },
     en_revision: { cls: 'bg-warning text-dark', label: 'En Revisión' },
-    aprobada:    { cls: 'bg-success',           label: 'Aprobada'    },
-    rechazada:   { cls: 'bg-danger',            label: 'Rechazada'   },
+    aprobada: { cls: 'bg-success', label: 'Aprobada' },
+    rechazada: { cls: 'bg-danger', label: 'Rechazada' },
 };
 
 // MySQL devuelve la fecha como "YYYY-MM-DD HH:MM:SS", hay que reemplazar el espacio
@@ -115,3 +115,33 @@ function buildDetalleHtml(s) {
             </div>
         </div>`;
 }
+
+// Tarjeta movil para la tabla de administración
+function buildMobileCard(s) {
+    return `
+        <div class="p-3 border-bottom bg-white">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="fw-bold text-dark">${escapeHtml(s.nombre_solicitante)}</span>
+                <div>${badgeEstado(s.estado)}</div>
+            </div>
+            <div class="d-flex flex-column gap-1 mb-3 small text-muted">
+                <div><i class="bi bi-hash text-secondary me-1"></i> ID: #${s.id}</div>
+                <div><i class="bi bi-envelope text-secondary me-1"></i> ${escapeHtml(s.correo_electronico)}</div>
+                <div><i class="bi bi-tag text-secondary me-1"></i> ${labelTipo(s.tipo_solicitud)}</div>
+                <div><i class="bi bi-calendar3 text-secondary me-1"></i> ${formatFecha(s.fecha_creacion)}</div>
+            </div>
+            <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-outline-secondary flex-fill btn-ver-detalle"
+                    data-id="${s.id}">
+                    <i class="bi bi-eye"></i> Ver
+                </button>
+                <button class="btn btn-sm btn-outline-primary flex-fill btn-cambiar-estado"
+                    data-id="${s.id}"
+                    data-nombre="${escapeHtml(s.nombre_solicitante)}"
+                    data-estado="${s.estado}">
+                    <i class="bi bi-pencil"></i> Estado
+                </button>
+            </div>
+        </div>`;
+}
+
