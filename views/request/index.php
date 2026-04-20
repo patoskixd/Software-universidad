@@ -5,11 +5,7 @@
         <h5 class="mb-0 fw-bold">Solicitudes</h5>
         <small class="text-muted" id="totalCount">Cargando…</small>
     </div>
-    <button
-        class="btn btn-primary"
-        data-bs-toggle="modal"
-        data-bs-target="#modalNuevaSolicitud"
-    >
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalNuevaSolicitud">
         <i class="bi bi-plus-lg me-1"></i> Nueva Solicitud
     </button>
 </div>
@@ -40,18 +36,10 @@
             </div>
             <div class="col-md-4">
                 <label for="filterTexto" class="form-label fw-semibold">Búsqueda libre</label>
-                <input
-                    type="text"
-                    id="filterTexto"
-                    class="form-control"
-                    placeholder="Nombre o correo electrónico…"
-                    maxlength="100"
-                >
+                <input type="text" id="filterTexto" class="form-control" placeholder="Nombre o correo electrónico…"
+                    maxlength="100">
             </div>
             <div class="col-auto d-flex gap-2">
-                <button type="submit" class="btn btn-primary" title="Buscar">
-                    <i class="bi bi-search"></i>
-                </button>
                 <button type="button" id="btnLimpiarFiltros" class="btn btn-outline-secondary" title="Limpiar filtros">
                     <i class="bi bi-x-lg"></i>
                 </button>
@@ -67,11 +55,21 @@
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-light">
                     <tr>
-                        <th class="ps-3">ID</th>
-                        <th>Solicitante</th>
-                        <th>Tipo</th>
-                        <th>Estado</th>
-                        <th>Fecha</th>
+                        <th class="ps-3 sortable user-select-none" data-sort="id" style="cursor: pointer;" title="Ordenar por ID">
+                            ID <i class="bi bi-arrow-down-up text-muted ms-1 sort-icon"></i>
+                        </th>
+                        <th class="sortable user-select-none" data-sort="nombre_solicitante" style="cursor: pointer;" title="Ordenar por Solicitante">
+                            Solicitante <i class="bi bi-arrow-down-up text-muted ms-1 sort-icon"></i>
+                        </th>
+                        <th class="sortable user-select-none" data-sort="tipo_solicitud" style="cursor: pointer;" title="Ordenar por Tipo">
+                            Tipo <i class="bi bi-arrow-down-up text-muted ms-1 sort-icon"></i>
+                        </th>
+                        <th class="sortable user-select-none" data-sort="estado" style="cursor: pointer;" title="Ordenar por Estado">
+                            Estado <i class="bi bi-arrow-down-up text-muted ms-1 sort-icon"></i>
+                        </th>
+                        <th class="sortable user-select-none" data-sort="fecha_creacion" style="cursor: pointer;" title="Ordenar por Fecha">
+                            Fecha <i class="bi bi-arrow-down-up text-muted ms-1 sort-icon"></i>
+                        </th>
                         <th class="text-center pe-3">Acciones</th>
                     </tr>
                 </thead>
@@ -84,25 +82,16 @@
 </div>
 
 <!-- Modal: Nueva Solicitud -->
-<div
-    class="modal fade"
-    id="modalNuevaSolicitud"
-    tabindex="-1"
-    aria-labelledby="modalNuevaSolicitudLabel"
-    aria-hidden="true"
->
+<div class="modal fade" id="modalNuevaSolicitud" tabindex="-1" aria-labelledby="modalNuevaSolicitudLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title" id="modalNuevaSolicitudLabel">
                     <i class="bi bi-file-earmark-plus me-2"></i>Nueva Solicitud
                 </h5>
-                <button
-                    type="button"
-                    class="btn-close btn-close-white"
-                    data-bs-dismiss="modal"
-                    aria-label="Cerrar"
-                ></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Cerrar"></button>
             </div>
 
             <form id="formNuevaSolicitud" novalidate>
@@ -117,27 +106,15 @@
                             <label for="inputNombre" class="form-label">
                                 Nombre completo <span class="text-danger">*</span>
                             </label>
-                            <input
-                                type="text"
-                                id="inputNombre"
-                                name="nombre_solicitante"
-                                class="form-control"
-                                maxlength="150"
-                                required
-                            >
+                            <input type="text" id="inputNombre" name="nombre_solicitante" class="form-control"
+                                maxlength="150" required>
                         </div>
                         <div class="col-md-6">
                             <label for="inputCorreo" class="form-label">
                                 Correo electrónico <span class="text-danger">*</span>
                             </label>
-                            <input
-                                type="email"
-                                id="inputCorreo"
-                                name="correo_electronico"
-                                class="form-control"
-                                maxlength="150"
-                                required
-                            >
+                            <input type="email" id="inputCorreo" name="correo_electronico" class="form-control"
+                                maxlength="150" required>
                         </div>
                         <div class="col-md-6">
                             <label for="inputTipo" class="form-label">
@@ -155,14 +132,8 @@
                             <label for="inputDescripcion" class="form-label">
                                 Descripción <span class="text-danger">*</span>
                             </label>
-                            <textarea
-                                id="inputDescripcion"
-                                name="descripcion"
-                                class="form-control"
-                                rows="4"
-                                placeholder="Describa su solicitud con el mayor detalle posible…"
-                                required
-                            ></textarea>
+                            <textarea id="inputDescripcion" name="descripcion" class="form-control" rows="4"
+                                placeholder="Describa su solicitud con el mayor detalle posible…" required></textarea>
                             <div class="form-text">Mínimo 10 caracteres.</div>
                         </div>
                     </div>
@@ -182,25 +153,15 @@
 </div>
 
 <!-- Modal: Actualizar Estado -->
-<div
-    class="modal fade"
-    id="modalActualizarEstado"
-    tabindex="-1"
-    aria-labelledby="modalActualizarEstadoLabel"
-    aria-hidden="true"
->
+<div class="modal fade" id="modalActualizarEstado" tabindex="-1" aria-labelledby="modalActualizarEstadoLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="modalActualizarEstadoLabel">
                     <i class="bi bi-pencil-square me-2"></i>Actualizar Estado
                 </h5>
-                <button
-                    type="button"
-                    class="btn-close"
-                    data-bs-dismiss="modal"
-                    aria-label="Cerrar"
-                ></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
 
             <form id="formActualizarEstado">
@@ -235,25 +196,14 @@
 </div>
 
 <!-- Modal: Ver Detalle -->
-<div
-    class="modal fade"
-    id="modalDetalle"
-    tabindex="-1"
-    aria-labelledby="modalDetalleLabel"
-    aria-hidden="true"
->
+<div class="modal fade" id="modalDetalle" tabindex="-1" aria-labelledby="modalDetalleLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="modalDetalleLabel">
                     <i class="bi bi-file-text me-2"></i>Detalle de Solicitud
                 </h5>
-                <button
-                    type="button"
-                    class="btn-close"
-                    data-bs-dismiss="modal"
-                    aria-label="Cerrar"
-                ></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <div class="modal-body" id="detalleContenido">
                 <!-- Cargado dinámicamente -->

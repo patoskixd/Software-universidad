@@ -4,6 +4,9 @@ const API_URL = 'api/solicitudes.php';
 
 let modalNueva, modalEstado, modalDetalle;
 let filtrosActivos = {};
+let solicitudesActuales = [];
+let sortCol = 'id';
+let sortDesc = true;
 
 
 const LABELS_TIPO = {
@@ -116,11 +119,53 @@ async function cargarSolicitudes(filtros = {}) {
     const url = `${API_URL}${params.toString() ? '?' + params : ''}`;
 
     try {
-        const data = await fetchJSON(url);
-        renderTabla(data);
+        solicitudesActuales = await fetchJSON(url);
+        aplicarOrden();
     } catch (err) {
         mostrarAlerta('danger', err.messages?.[0] ?? 'Error al cargar las solicitudes.');
     }
+}
+
+function aplicarOrden() {
+    if (!solicitudesActuales || !solicitudesActuales.length) {
+        renderTabla([]);
+        actualizarIconosSort();
+        return;
+    }
+
+    solicitudesActuales.sort((a, b) => {
+        let valA = a[sortCol];
+        let valB = b[sortCol];
+
+        if (sortCol === 'id') {
+            valA = parseInt(valA, 10);
+            valB = parseInt(valB, 10);
+        } else if (valA && valB) {
+            valA = valA.toString().toLowerCase();
+            valB = valB.toString().toLowerCase();
+        }
+
+        if (valA < valB) return sortDesc ? 1 : -1;
+        if (valA > valB) return sortDesc ? -1 : 1;
+        return 0;
+    });
+
+    renderTabla(solicitudesActuales);
+    actualizarIconosSort();
+}
+
+function actualizarIconosSort() {
+    document.querySelectorAll('.sortable').forEach(th => {
+        const icon = th.querySelector('.sort-icon');
+        if (!icon) return;
+        
+        icon.className = 'bi bi-arrow-down-up text-muted ms-1 sort-icon';
+        if (th.dataset.sort === sortCol) {
+            icon.className = sortDesc 
+                ? 'bi bi-arrow-down text-primary ms-1 sort-icon' 
+                : 'bi bi-arrow-up text-primary ms-1 sort-icon';
+        }
+    });
 }
 
 //  modal detalle 
@@ -324,14 +369,28 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     //  filtros 
-    document.getElementById('filterForm').addEventListener('submit', e => {
-        e.preventDefault();
+    const aplicarFiltros = () => {
         filtrosActivos = {
             estado:         document.getElementById('filterEstado').value,
             tipo_solicitud: document.getElementById('filterTipo').value,
             texto:          document.getElementById('filterTexto').value.trim(),
         };
         cargarSolicitudes(filtrosActivos);
+    };
+
+    document.getElementById('filterForm').addEventListener('submit', e => {
+        e.preventDefault();
+        aplicarFiltros();
+    });
+
+    // Filtros instantáneos
+    document.getElementById('filterEstado').addEventListener('change', aplicarFiltros);
+    document.getElementById('filterTipo').addEventListener('change', aplicarFiltros);
+
+    let debounceTimer;
+    document.getElementById('filterTexto').addEventListener('input', () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(aplicarFiltros, 300);
     });
 
     document.getElementById('btnLimpiarFiltros').addEventListener('click', () => {
@@ -340,6 +399,20 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('filterTexto').value  = '';
         filtrosActivos = {};
         cargarSolicitudes();
+    });
+
+    //  ordenamiento
+    document.querySelectorAll('.sortable').forEach(th => {
+        th.addEventListener('click', () => {
+            const col = th.dataset.sort;
+            if (sortCol === col) {
+                sortDesc = !sortDesc;
+            } else {
+                sortCol = col;
+                sortDesc = col === 'id' || col === 'fecha_creacion'; // por defecto descendente para id y fecha
+            }
+            aplicarOrden();
+        });
     });
 
     //  Carga inicial 
