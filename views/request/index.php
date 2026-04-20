@@ -120,7 +120,8 @@
                                 style="font-size:.7rem;"></i>
                         </th>
                         <th class="sortable user-select-none" data-sort="fecha_creacion" title="Ordenar por Fecha">
-                            Fecha <i class="bi bi-arrow-down-up text-muted ms-1 sort-icon" style="font-size:.7rem;"></i>
+                            Fecha Creación <i class="bi bi-arrow-down-up text-muted ms-1 sort-icon"
+                                style="font-size:.7rem;"></i>
                         </th>
                         <th class="text-center pe-3">Acciones</th>
                     </tr>

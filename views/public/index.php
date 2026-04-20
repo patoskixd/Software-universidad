@@ -9,17 +9,19 @@
                     <circle cx="145" cy="0" r="55" fill="white" />
                     <circle cx="185" cy="90" r="40" fill="white" />
                 </svg>
-                <div style="position:relative;z-index:1;">
-                    <div class="form-hero-icon">
+                <div style="position:relative;z-index:1;display:flex;align-items:center;gap:.85rem;">
+                    <div class="form-hero-icon" style="margin-bottom:0;flex-shrink:0;">
                         <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor">
                             <path
                                 d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm4 18H6V4h7v5h5v11zM8 15h8v2H8zm0-4h8v2H8z" />
                         </svg>
                     </div>
-                    <h4 class="mb-1 fw-bold">Nueva Solicitud Administrativa</h4>
-                    <p class="mb-0 text-white-50 small">
-                        Complete el formulario y recibirá una respuesta en su correo electrónico.
-                    </p>
+                    <div>
+                        <h4 class="mb-1 fw-bold">Nueva Solicitud Administrativa</h4>
+                        <p class="mb-0 text-white-50 small">
+                            Complete el formulario y recibirá una respuesta en su correo electrónico.
+                        </p>
+                    </div>
                 </div>
             </div>
 

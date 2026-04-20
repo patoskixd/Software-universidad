@@ -21,7 +21,10 @@ const BADGE_ESTADO = {
 function formatFecha(iso) {
     if (!iso) return '—';
     return new Date(iso.replace(' ', 'T'))
-        .toLocaleString('es-CL', { dateStyle: 'short', timeStyle: 'short' });
+        .toLocaleString('es-CL', {
+            day: '2-digit', month: '2-digit', year: '2-digit',
+            hour: '2-digit', minute: '2-digit', hour12: false
+        });
 }
 
 function labelTipo(tipo) {
