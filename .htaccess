@@ -4,7 +4,7 @@
     RewriteEngine On
     
     # Si alguien intenta entrar a estas carpetas, lanza un 403 Forbidden
-    RewriteRule ^(api|app|config|core|database|views)(/|$) - [F,L]
+    RewriteRule ^(app|config|core|database|views)(/|$) - [F,L]
 </IfModule>
 
 # Seguridad Extra impedir que se listen archivos en carpetas vacias

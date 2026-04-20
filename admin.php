@@ -2,14 +2,14 @@
 
 require_once __DIR__ . '/app/core/Auth.php';
 
-Auth::start();
+Auth::requireWeb();
 
-$pageTitle   = 'Nueva solicitud';
-$pageScript  = 'assets/js/public.js';
+$pageTitle   = 'Gestión de Solicitudes';
+$pageScript  = 'assets/js/main.js';
 $adminActual = Auth::user();
 
 ob_start();
-require __DIR__ . '/views/public/index.php';
+require __DIR__ . '/views/request/index.php';
 $content = ob_get_clean();
 
 require __DIR__ . '/views/layouts/main.php';

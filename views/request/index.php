@@ -3,6 +3,7 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
         <h5 class="mb-0 fw-bold">Solicitudes</h5>
+        <small class="text-muted" id="totalCount">Cargando…</small>
     </div>
     <button
         class="btn btn-primary"
@@ -75,48 +76,14 @@
                     </tr>
                 </thead>
                 <tbody id="solicitudesTableBody">
-                    <?php
-                    $badgeClase = ['pendiente' => 'warning', 'en_revision' => 'info', 'aprobada' => 'success', 'rechazada' => 'danger'];
-                    $tipoLabel  = ['academica' => 'Académica', 'certificado' => 'Certificado', 'actualizacion_datos' => 'Actualización de Datos', 'otra' => 'Otra'];
-                    foreach ($solicitudes ?? [] as $s): ?>
-                    <tr>
-                        <td class="ps-3"><?= $s['id'] ?></td>
-                        <td><?= htmlspecialchars($s['nombre_solicitante']) ?></td>
-                        <td><?= $tipoLabel[$s['tipo_solicitud']] ?? $s['tipo_solicitud'] ?></td>
-                        <td>
-                            <span class="badge bg-<?= $badgeClase[$s['estado']] ?? 'secondary' ?>">
-                                <?= ucfirst(str_replace('_', ' ', $s['estado'])) ?>
-                            </span>
-                        </td>
-                        <td><?= date('d/m/Y', strtotime($s['fecha_creacion'])) ?></td>
-                        <td class="text-center pe-3 d-flex gap-1 justify-content-center">
-                            <button class="btn btn-sm btn-outline-secondary" title="Ver detalle">
-                                <i class="bi bi-eye"></i>
-                            </button>
-                            <button
-                                class="btn btn-sm btn-outline-primary"
-                                title="Actualizar estado"
-                                data-bs-toggle="modal"
-                                data-bs-target="#modalActualizarEstado"
-                                data-nombre="<?= htmlspecialchars($s['nombre_solicitante']) ?>"
-                                data-estado="<?= $s['estado'] ?>"
-                                onclick="
-                                    document.getElementById('updateNombreDisplay').textContent = this.dataset.nombre;
-                                    document.getElementById('updateEstado').value = this.dataset.estado;
-                                "
-                            >
-                                <i class="bi bi-pencil-square"></i>
-                            </button>
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
+                    <!-- Renderizado dinámicamente por JS -->
                 </tbody>
             </table>
         </div>
     </div>
 </div>
 
-<!-- Modal de nueva solicitud -->
+<!-- Modal: Nueva Solicitud -->
 <div
     class="modal fade"
     id="modalNuevaSolicitud"
@@ -214,7 +181,7 @@
     </div>
 </div>
 
-<!-- Modal de actualizar estado -->
+<!-- Modal: Actualizar Estado -->
 <div
     class="modal fade"
     id="modalActualizarEstado"
@@ -267,7 +234,7 @@
     </div>
 </div>
 
-<!-- Modal de ver detalles -->
+<!-- Modal: Ver Detalle -->
 <div
     class="modal fade"
     id="modalDetalle"
@@ -289,7 +256,7 @@
                 ></button>
             </div>
             <div class="modal-body" id="detalleContenido">
-                <!-- Cargado dinamicamente -->
+                <!-- Cargado dinámicamente -->
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">

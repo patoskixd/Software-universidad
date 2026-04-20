@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/../Core/Database.php';
 require_once __DIR__ . '/../Core/Response.php';
+require_once __DIR__ . '/../Core/Auth.php';
 require_once __DIR__ . '/../Models/Solicitud.php';
 
 class SolicitudController
@@ -38,6 +39,8 @@ class SolicitudController
 
     private function index(): void
     {
+        Auth::requireApi();
+
         if (!empty($_GET['id'])) {
             $id = filter_var($_GET['id'], FILTER_VALIDATE_INT);
             if ($id === false || $id <= 0) {
@@ -80,6 +83,8 @@ class SolicitudController
 
     private function updateEstado(): void
     {
+        Auth::requireApi();
+
         $data   = json_decode(file_get_contents('php://input'), true);
         $errors = $this->model->validateEstado($data);
 

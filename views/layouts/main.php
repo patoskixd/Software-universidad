@@ -18,27 +18,45 @@
 </head>
 <body>
 
-    <!--  Navbar  -->
     <nav class="navbar navbar-dark bg-primary shadow-sm">
         <div class="container-fluid px-4">
-            <span class="navbar-brand mb-0 h1">
+            <a class="navbar-brand mb-0 h1 text-decoration-none" href="index.php">
                 <i class="bi bi-mortarboard-fill me-2"></i>
                 Sistema de Solicitudes Administrativas
-            </span>
+            </a>
+
+            <div class="d-flex align-items-center text-white">
+                <?php if (!empty($adminActual)): ?>
+                    <span class="me-3 small d-none d-sm-inline">
+                        <i class="bi bi-person-circle me-1"></i>
+                        <?= htmlspecialchars($adminActual['nombre']) ?>
+                    </span>
+                    <a href="admin.php" class="btn btn-sm btn-outline-light me-2">
+                        <i class="bi bi-speedometer2 me-1"></i> Panel
+                    </a>
+                    <a href="logout.php" class="btn btn-sm btn-light">
+                        <i class="bi bi-box-arrow-right me-1"></i> Salir
+                    </a>
+                <?php else: ?>
+                    <a href="login.php" class="btn btn-sm btn-light">
+                        <i class="bi bi-box-arrow-in-right me-1"></i> Acceso admin
+                    </a>
+                <?php endif; ?>
+            </div>
         </div>
     </nav>
 
-    <!--  Contenido inyectado desde la vista  -->
     <main class="container my-4">
         <?= $content ?>
     </main>
 
-    <!--  Bootstrap y logica del frontend  -->
     <script
         src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"
     ></script>
-    <script src="assets/js/main.js"></script>
+    <?php if (!empty($pageScript)): ?>
+        <script src="<?= htmlspecialchars($pageScript) ?>"></script>
+    <?php endif; ?>
 </body>
 </html>
