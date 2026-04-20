@@ -7,20 +7,20 @@ let filtrosActivos = {};
 let solicitudesActuales = [];
 let sortCol = 'id';
 let sortDesc = true;
-
+let paginaActual = 1;
 
 const LABELS_TIPO = {
-    academica:           'Académica',
-    certificado:         'Certificado',
+    academica: 'Académica',
+    certificado: 'Certificado',
     actualizacion_datos: 'Actualización de Datos',
-    otra:                'Otra',
+    otra: 'Otra',
 };
 
 const BADGE_ESTADO = {
-    pendiente:   { cls: 'bg-secondary',        label: 'Pendiente'   },
+    pendiente: { cls: 'bg-secondary', label: 'Pendiente' },
     en_revision: { cls: 'bg-warning text-dark', label: 'En Revisión' },
-    aprobada:    { cls: 'bg-success',           label: 'Aprobada'    },
-    rechazada:   { cls: 'bg-danger',            label: 'Rechazada'   },
+    aprobada: { cls: 'bg-success', label: 'Aprobada' },
+    rechazada: { cls: 'bg-danger', label: 'Rechazada' },
 };
 
 function badgeEstado(estado) {
@@ -89,7 +89,7 @@ function buildTableRow(s) {
 }
 
 function renderTabla(solicitudes) {
-    const tbody  = document.getElementById('solicitudesTableBody');
+    const tbody = document.getElementById('solicitudesTableBody');
     const totalEl = document.getElementById('totalCount');
 
     if (!solicitudes.length) {
@@ -100,29 +100,111 @@ function renderTabla(solicitudes) {
                     No se encontraron solicitudes con los filtros aplicados.
                 </td>
             </tr>`;
-        totalEl.textContent = '0 solicitudes';
         return;
     }
 
     tbody.innerHTML = solicitudes.map(buildTableRow).join('');
-    totalEl.textContent = `${solicitudes.length} solicitud${solicitudes.length !== 1 ? 'es' : ''}`;
 }
 
 //  carga con filtros 
 
 async function cargarSolicitudes(filtros = {}) {
     const params = new URLSearchParams();
-    if (filtros.estado)         params.set('estado', filtros.estado);
+    if (filtros.estado) params.set('estado', filtros.estado);
     if (filtros.tipo_solicitud) params.set('tipo_solicitud', filtros.tipo_solicitud);
-    if (filtros.texto)          params.set('texto', filtros.texto);
+    if (filtros.texto) params.set('texto', filtros.texto);
 
-    const url = `${API_URL}${params.toString() ? '?' + params : ''}`;
+    // Añadimos paginacion a los parámetros
+    params.set('page', paginaActual);
+    params.set('limit', 10);
+
+    const url = `${API_URL}?${params.toString()}`;
 
     try {
-        solicitudesActuales = await fetchJSON(url);
+        const response = await fetchJSON(url);
+
+        // Ahora response es un objeto con datos y paginación
+        solicitudesActuales = response.data;
+
         aplicarOrden();
+        renderPaginacion(response);
     } catch (err) {
         mostrarAlerta('danger', err.messages?.[0] ?? 'Error al cargar las solicitudes.');
+    }
+}
+
+function renderPaginacion(info) {
+    const totalEl = document.getElementById('totalCount');
+    const pagInfo = document.getElementById('paginationInfo');
+    const pagContainer = document.getElementById('paginationContainer');
+
+    if (!info.total) {
+        totalEl.textContent = '0 solicitudes';
+        if (pagInfo) pagInfo.textContent = 'No hay resultados';
+        if (pagContainer) pagContainer.innerHTML = '';
+        return;
+    }
+
+    const { page, limit, total, last_page } = info;
+
+    totalEl.textContent = `${total} solicitud${total !== 1 ? 'es' : ''}`;
+
+    if (pagInfo) {
+        const start = ((page - 1) * limit) + 1;
+        const end = Math.min(page * limit, total);
+        pagInfo.textContent = `Mostrando ${start} a ${end} de ${total} resultados`;
+    }
+
+    if (pagContainer) {
+        let html = '';
+
+        // Botón Anterior
+        html += `
+            <li class="page-item ${page <= 1 ? 'disabled' : ''}">
+                <a class="page-link" href="#" data-page="${page - 1}" aria-label="Anterior">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+        `;
+
+        // Botones de número de página
+        for (let i = 1; i <= last_page; i++) {
+            // Lógica para mostrar solo algunas páginas (por ahora mostramos limitadas)
+            if (i === 1 || i === last_page || (i >= page - 2 && i <= page + 2)) {
+                html += `
+                    <li class="page-item ${i === page ? 'active' : ''}">
+                        <a class="page-link" href="#" data-page="${i}">${i}</a>
+                    </li>
+                `;
+            } else if (i === page - 3 || i === page + 3) {
+                html += `
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                `;
+            }
+        }
+
+        // Botón Siguiente
+        html += `
+            <li class="page-item ${page >= last_page ? 'disabled' : ''}">
+                <a class="page-link" href="#" data-page="${page + 1}" aria-label="Siguiente">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        `;
+
+        pagContainer.innerHTML = html;
+
+        // Event Listeners a los botones
+        pagContainer.querySelectorAll('a.page-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const btn = e.currentTarget;
+                if (!btn.parentElement.classList.contains('disabled')) {
+                    paginaActual = parseInt(btn.dataset.page, 10);
+                    cargarSolicitudes(filtrosActivos);
+                }
+            });
+        });
     }
 }
 
@@ -158,11 +240,11 @@ function actualizarIconosSort() {
     document.querySelectorAll('.sortable').forEach(th => {
         const icon = th.querySelector('.sort-icon');
         if (!icon) return;
-        
+
         icon.className = 'bi bi-arrow-down-up text-muted ms-1 sort-icon';
         if (th.dataset.sort === sortCol) {
-            icon.className = sortDesc 
-                ? 'bi bi-arrow-down text-primary ms-1 sort-icon' 
+            icon.className = sortDesc
+                ? 'bi bi-arrow-down text-primary ms-1 sort-icon'
                 : 'bi bi-arrow-up text-primary ms-1 sort-icon';
         }
     });
@@ -209,27 +291,27 @@ async function verDetalle(id) {
 //  modal estado 
 
 function abrirModalEstado(id, nombre, estadoActual) {
-    document.getElementById('updateId').value                = id;
+    document.getElementById('updateId').value = id;
     document.getElementById('updateNombreDisplay').textContent = nombre;
-    document.getElementById('updateEstado').value             = estadoActual;
+    document.getElementById('updateEstado').value = estadoActual;
     modalEstado.show();
 }
 
 async function guardarEstado(e) {
     e.preventDefault();
 
-    const id     = parseInt(document.getElementById('updateId').value, 10);
+    const id = parseInt(document.getElementById('updateId').value, 10);
     const estado = document.getElementById('updateEstado').value;
-    const btn    = document.getElementById('btnGuardarEstado');
+    const btn = document.getElementById('btnGuardarEstado');
 
-    btn.disabled  = true;
+    btn.disabled = true;
     btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Guardando…';
 
     try {
         await fetchJSON(API_URL, {
-            method:  'PATCH',
+            method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify({ id, estado }),
+            body: JSON.stringify({ id, estado }),
         });
 
         modalEstado.hide();
@@ -238,7 +320,7 @@ async function guardarEstado(e) {
     } catch (err) {
         mostrarAlerta('danger', err.messages?.[0] ?? 'Error al actualizar el estado.');
     } finally {
-        btn.disabled  = false;
+        btn.disabled = false;
         btn.innerHTML = '<i class="bi bi-check-lg me-1"></i> Guardar Cambio';
     }
 }
@@ -248,29 +330,29 @@ async function guardarEstado(e) {
 async function enviarNuevaSolicitud(e) {
     e.preventDefault();
 
-    const form   = document.getElementById('formNuevaSolicitud');
+    const form = document.getElementById('formNuevaSolicitud');
     const errBox = document.getElementById('erroresNueva');
-    const btn    = document.getElementById('btnEnviarSolicitud');
+    const btn = document.getElementById('btnEnviarSolicitud');
 
     // limpiar errores previos
     errBox.classList.add('d-none');
     errBox.querySelector('.lista-errores').innerHTML = '';
 
     const payload = {
-        nombre_solicitante:  form.nombre_solicitante.value.trim(),
-        correo_electronico:  form.correo_electronico.value.trim(),
-        tipo_solicitud:      form.tipo_solicitud.value,
-        descripcion:         form.descripcion.value.trim(),
+        nombre_solicitante: form.nombre_solicitante.value.trim(),
+        correo_electronico: form.correo_electronico.value.trim(),
+        tipo_solicitud: form.tipo_solicitud.value,
+        descripcion: form.descripcion.value.trim(),
     };
 
-    btn.disabled  = true;
+    btn.disabled = true;
     btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Enviando…';
 
     try {
         await fetchJSON(API_URL, {
-            method:  'POST',
+            method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify(payload),
+            body: JSON.stringify(payload),
         });
 
         modalNueva.hide();
@@ -286,7 +368,7 @@ async function enviarNuevaSolicitud(e) {
         });
         errBox.classList.remove('d-none');
     } finally {
-        btn.disabled  = false;
+        btn.disabled = false;
         btn.innerHTML = '<i class="bi bi-send me-1"></i> Enviar Solicitud';
     }
 }
@@ -330,8 +412,8 @@ function escapeHtml(str) {
 
 document.addEventListener('DOMContentLoaded', () => {
     // Instanciar modales de Bootstrap
-    modalNueva   = new bootstrap.Modal(document.getElementById('modalNuevaSolicitud'));
-    modalEstado  = new bootstrap.Modal(document.getElementById('modalActualizarEstado'));
+    modalNueva = new bootstrap.Modal(document.getElementById('modalNuevaSolicitud'));
+    modalEstado = new bootstrap.Modal(document.getElementById('modalActualizarEstado'));
     modalDetalle = new bootstrap.Modal(document.getElementById('modalDetalle'));
 
     //  Listeners de formularios 
@@ -371,10 +453,11 @@ document.addEventListener('DOMContentLoaded', () => {
     //  filtros 
     const aplicarFiltros = () => {
         filtrosActivos = {
-            estado:         document.getElementById('filterEstado').value,
+            estado: document.getElementById('filterEstado').value,
             tipo_solicitud: document.getElementById('filterTipo').value,
-            texto:          document.getElementById('filterTexto').value.trim(),
+            texto: document.getElementById('filterTexto').value.trim(),
         };
+        paginaActual = 1;
         cargarSolicitudes(filtrosActivos);
     };
 
@@ -395,9 +478,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('btnLimpiarFiltros').addEventListener('click', () => {
         document.getElementById('filterEstado').value = '';
-        document.getElementById('filterTipo').value   = '';
-        document.getElementById('filterTexto').value  = '';
+        document.getElementById('filterTipo').value = '';
+        document.getElementById('filterTexto').value = '';
         filtrosActivos = {};
+        paginaActual = 1;
         cargarSolicitudes();
     });
 

@@ -12,10 +12,9 @@ class Solicitud
         $this->pdo = $pdo;
     }
 
-    public function getAll(array $filters = []): array
+    private function buildConditions(array $filters, array &$params): array
     {
         $conditions = [];
-        $params     = [];
 
         if (!empty($filters['estado']) && in_array($filters['estado'], self::ESTADOS_VALIDOS, true)) {
             $conditions[] = 'estado = ?';
@@ -34,6 +33,31 @@ class Solicitud
             $params[]     = $like;
         }
 
+        return $conditions;
+    }
+
+    public function getTotal(array $filters = []): int
+    {
+        $params     = [];
+        $conditions = $this->buildConditions($filters, $params);
+
+        $sql = 'SELECT COUNT(*) FROM solicitudes';
+
+        if ($conditions) {
+            $sql .= ' WHERE ' . implode(' AND ', $conditions);
+        }
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+
+        return (int) $stmt->fetchColumn();
+    }
+
+    public function getAll(array $filters = [], int $limit = 10, int $offset = 0): array
+    {
+        $params     = [];
+        $conditions = $this->buildConditions($filters, $params);
+
         $sql = 'SELECT id, nombre_solicitante, correo_electronico,
                        tipo_solicitud, descripcion, estado, fecha_creacion
                 FROM solicitudes';
@@ -42,7 +66,7 @@ class Solicitud
             $sql .= ' WHERE ' . implode(' AND ', $conditions);
         }
 
-        $sql .= ' ORDER BY fecha_creacion DESC';
+        $sql .= ' ORDER BY fecha_creacion DESC LIMIT ' . (int)$limit . ' OFFSET ' . (int)$offset;
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);

@@ -61,7 +61,20 @@ class SolicitudController
             'texto'          => $_GET['texto']          ?? '',
         ];
 
-        Response::json($this->model->getAll($filters));
+        $page  = max(1, (int)($_GET['page'] ?? 1));
+        $limit = max(1, (int)($_GET['limit'] ?? 10)); // Default 10 rows
+        $offset = ($page - 1) * $limit;
+
+        $total = $this->model->getTotal($filters);
+        $data  = $this->model->getAll($filters, $limit, $offset);
+
+        Response::json([
+            'data'      => $data,
+            'total'     => $total,
+            'page'      => $page,
+            'limit'     => $limit,
+            'last_page' => max(1, ceil($total / $limit)),
+        ]);
     }
 
     private function store(): void

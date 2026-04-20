@@ -55,28 +55,41 @@
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-light">
                     <tr>
-                        <th class="ps-3 sortable user-select-none" data-sort="id" style="cursor: pointer;" title="Ordenar por ID">
+                        <th class="ps-3 sortable user-select-none" data-sort="id" style="cursor: pointer;"
+                            title="Ordenar por ID">
                             ID <i class="bi bi-arrow-down-up text-muted ms-1 sort-icon"></i>
                         </th>
-                        <th class="sortable user-select-none" data-sort="nombre_solicitante" style="cursor: pointer;" title="Ordenar por Solicitante">
+                        <th class="sortable user-select-none" data-sort="nombre_solicitante" style="cursor: pointer;"
+                            title="Ordenar por Solicitante">
                             Solicitante <i class="bi bi-arrow-down-up text-muted ms-1 sort-icon"></i>
                         </th>
-                        <th class="sortable user-select-none" data-sort="tipo_solicitud" style="cursor: pointer;" title="Ordenar por Tipo">
+                        <th class="sortable user-select-none" data-sort="tipo_solicitud" style="cursor: pointer;"
+                            title="Ordenar por Tipo">
                             Tipo <i class="bi bi-arrow-down-up text-muted ms-1 sort-icon"></i>
                         </th>
-                        <th class="sortable user-select-none" data-sort="estado" style="cursor: pointer;" title="Ordenar por Estado">
+                        <th class="sortable user-select-none" data-sort="estado" style="cursor: pointer;"
+                            title="Ordenar por Estado">
                             Estado <i class="bi bi-arrow-down-up text-muted ms-1 sort-icon"></i>
                         </th>
-                        <th class="sortable user-select-none" data-sort="fecha_creacion" style="cursor: pointer;" title="Ordenar por Fecha">
+                        <th class="sortable user-select-none" data-sort="fecha_creacion" style="cursor: pointer;"
+                            title="Ordenar por Fecha">
                             Fecha <i class="bi bi-arrow-down-up text-muted ms-1 sort-icon"></i>
                         </th>
                         <th class="text-center pe-3">Acciones</th>
                     </tr>
                 </thead>
                 <tbody id="solicitudesTableBody">
-                    <!-- Renderizado dinámicamente por JS -->
                 </tbody>
             </table>
+        </div>
+
+        <!-- Paginacion -->
+        <div class="d-flex justify-content-between align-items-center p-3 border-top bg-light">
+            <small class="text-muted" id="paginationInfo">Mostrando 0 a 0 de 0 resultados</small>
+            <nav aria-label="Navegación de páginas">
+                <ul class="pagination pagination-sm mb-0" id="paginationContainer">
+                </ul>
+            </nav>
         </div>
     </div>
 </div>
