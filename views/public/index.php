@@ -1,5 +1,3 @@
-<div id="alertContainer" role="alert" aria-live="polite"></div>
-
 <div class="row justify-content-center g-4">
     <div class="col-lg-8">
         <div class="card shadow-sm overflow-hidden">

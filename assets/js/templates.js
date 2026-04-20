@@ -118,7 +118,7 @@ function buildDetalleHtml(s) {
         ${s.observaciones ? `
         <div class="col-12 mt-3">
             <div class="detail-item mb-0">
-                <div class="detail-label text-primary"><i class="bi bi-chat-left-dots-fill me-1"></i>Observaciones / Feedback</div>
+                <div class="detail-label text-primary"><i class="bi bi-chat-left-dots-fill me-1"></i>Observaciones</div>
                 <div class="detail-value text-pre-wrap p-3 bg-white rounded border border-primary-subtle" style="font-size:.9rem;">
                     ${escapeHtml(s.observaciones)}
                 </div>

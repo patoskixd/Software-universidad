@@ -4,7 +4,7 @@ class Solicitud
 {
     private PDO $pdo;
 
-    public const TIPOS_VALIDOS   = ['academica', 'certificado', 'actualizacion_datos', 'otra'];
+    public const TIPOS_VALIDOS = ['academica', 'certificado', 'actualizacion_datos', 'otra'];
     public const ESTADOS_VALIDOS = ['pendiente', 'en_revision', 'aprobada', 'rechazada'];
 
     public function __construct(PDO $pdo)
@@ -18,19 +18,19 @@ class Solicitud
 
         if (!empty($filters['estado']) && in_array($filters['estado'], self::ESTADOS_VALIDOS, true)) {
             $conditions[] = 'estado = ?';
-            $params[]     = $filters['estado'];
+            $params[] = $filters['estado'];
         }
 
         if (!empty($filters['tipo_solicitud']) && in_array($filters['tipo_solicitud'], self::TIPOS_VALIDOS, true)) {
             $conditions[] = 'tipo_solicitud = ?';
-            $params[]     = $filters['tipo_solicitud'];
+            $params[] = $filters['tipo_solicitud'];
         }
 
         if (!empty($filters['texto'])) {
-            $like         = '%' . $filters['texto'] . '%';
+            $like = '%' . $filters['texto'] . '%';
             $conditions[] = '(nombre_solicitante LIKE ? OR correo_electronico LIKE ?)';
-            $params[]     = $like;
-            $params[]     = $like;
+            $params[] = $like;
+            $params[] = $like;
         }
 
         return $conditions;
@@ -38,7 +38,7 @@ class Solicitud
 
     public function getTotal(array $filters = []): int
     {
-        $params     = [];
+        $params = [];
         $conditions = $this->buildConditions($filters, $params);
 
         $sql = 'SELECT COUNT(*) FROM solicitudes';
@@ -62,7 +62,7 @@ class Solicitud
 
     public function getAll(array $filters = [], int $limit = 10, int $offset = 0): array
     {
-        $params     = [];
+        $params = [];
         $conditions = $this->buildConditions($filters, $params);
 
         $sql = 'SELECT id, nombre_solicitante, correo_electronico,
@@ -73,7 +73,7 @@ class Solicitud
             $sql .= ' WHERE ' . implode(' AND ', $conditions);
         }
 
-        $sql .= ' ORDER BY fecha_creacion DESC LIMIT ' . (int)$limit . ' OFFSET ' . (int)$offset;
+        $sql .= ' ORDER BY fecha_creacion DESC LIMIT ' . (int) $limit . ' OFFSET ' . (int) $offset;
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
@@ -126,7 +126,11 @@ class Solicitud
         $stmt = $this->pdo->prepare('UPDATE solicitudes SET estado = ?, observaciones = ? WHERE id = ?');
         $stmt->execute([$estado, $observaciones, $id]);
 
-        return $stmt->rowCount() > 0;
+        if ($stmt->rowCount() === 0) {
+            return $this->getById($id) !== null;
+        }
+
+        return true;
     }
 
     public function validate(?array $data): array

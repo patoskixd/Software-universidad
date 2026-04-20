@@ -1,5 +1,3 @@
-<div id="alertContainer" role="alert" aria-live="polite"></div>
-
 <!-- Admin header -->
 <div class="admin-page-header mb-4" style="position:relative;overflow:hidden;">
     <!-- SVG decorativo -->

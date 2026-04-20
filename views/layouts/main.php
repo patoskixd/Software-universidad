@@ -71,6 +71,8 @@
         <?= $content ?>
     </main>
 
+    <div id="toastContainer" class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index:1090;"></div>
+
     <footer class="site-footer mt-auto">
         <div class="container-fluid px-4 d-flex flex-column flex-sm-row justify-content-between align-items-center gap-1">
             <span>
