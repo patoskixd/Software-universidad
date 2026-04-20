@@ -1,0 +1,18 @@
+# IDEs y editores de codigo
+.vscode/
+.idea/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Logs y errores
+*.log
+error_log
+php_errors.log
+
+# Variables de entorno y configuración local
+.env
+.env.*
+config_local.php
