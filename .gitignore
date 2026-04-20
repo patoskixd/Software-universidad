@@ -16,3 +16,4 @@ php_errors.log
 .env
 .env.*
 config_local.php
+config/app.php

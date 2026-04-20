@@ -1,0 +1,14 @@
+# Denegar acceso directo a carpetas internas
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Bloquear acceso web a config/, app/ y database/
+    RewriteRule ^(config|app|database)(/|$) - [F,L]
+</IfModule>
+
+# Fallback para servidores sin mod_rewrite
+<FilesMatch "\.(php)$">
+    <If "%{REQUEST_URI} =~ m|^/(config|app|database)/|">
+        Require all denied
+    </If>
+</FilesMatch>
