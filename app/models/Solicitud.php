@@ -74,6 +74,18 @@ class Solicitud
         return $stmt->fetchAll();
     }
 
+    public function getByCorreo(string $correo): array
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT id, nombre_solicitante, correo_electronico, tipo_solicitud, descripcion, estado, fecha_creacion, fecha_actualizacion
+             FROM solicitudes
+             WHERE correo_electronico = ?
+             ORDER BY fecha_creacion DESC'
+        );
+        $stmt->execute([strtolower(trim($correo))]);
+        return $stmt->fetchAll();
+    }
+
     public function getById(int $id): ?array
     {
         $stmt = $this->pdo->prepare('SELECT * FROM solicitudes WHERE id = ?');

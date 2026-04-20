@@ -28,8 +28,8 @@ class SolicitudController
 
         try {
             match ($_SERVER['REQUEST_METHOD']) {
-                'GET'   => $this->index(),
-                'POST'  => $this->store(),
+                'GET' => $this->index(),
+                'POST' => $this->store(),
                 'PATCH' => $this->updateEstado(),
                 default => Response::error('Método no permitido.', 405),
             };
@@ -41,6 +41,15 @@ class SolicitudController
 
     private function index(): void
     {
+        // Consulta pública el solicitante busca sus propias solicitudes con su correo
+        if (isset($_GET['correo'])) {
+            $correo = trim($_GET['correo']);
+            if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
+                Response::error('Correo electrónico no válido.', 400);
+            }
+            Response::json($this->model->getByCorreo($correo));
+        }
+
         Middleware::run([fn() => Auth::requireApi()]);
 
         if (!empty($_GET['id'])) {
@@ -58,30 +67,30 @@ class SolicitudController
         }
 
         $filters = [
-            'estado'         => $_GET['estado']         ?? '',
+            'estado' => $_GET['estado'] ?? '',
             'tipo_solicitud' => $_GET['tipo_solicitud'] ?? '',
-            'texto'          => $_GET['texto']          ?? '',
+            'texto' => $_GET['texto'] ?? '',
         ];
 
-        $page  = max(1, (int)($_GET['page'] ?? 1));
-        $limit = max(1, (int)($_GET['limit'] ?? 10)); // Default 10 rows
+        $page = max(1, (int) ($_GET['page'] ?? 1));
+        $limit = max(1, (int) ($_GET['limit'] ?? 10)); // Default 10 rows
         $offset = ($page - 1) * $limit;
 
         $total = $this->model->getTotal($filters);
-        $data  = $this->model->getAll($filters, $limit, $offset);
+        $data = $this->model->getAll($filters, $limit, $offset);
 
         Response::json([
-            'data'      => $data,
-            'total'     => $total,
-            'page'      => $page,
-            'limit'     => $limit,
+            'data' => $data,
+            'total' => $total,
+            'page' => $page,
+            'limit' => $limit,
             'last_page' => max(1, ceil($total / $limit)),
         ]);
     }
 
     private function store(): void
     {
-        $data   = json_decode(file_get_contents('php://input'), true);
+        $data = json_decode(file_get_contents('php://input'), true);
         $errors = $this->model->validate($data);
 
         if ($errors) {
@@ -91,7 +100,7 @@ class SolicitudController
         $id = $this->model->create($data);
 
         Response::json([
-            'id'      => $id,
+            'id' => $id,
             'message' => 'Solicitud registrada exitosamente.',
         ], 201);
     }
@@ -103,15 +112,15 @@ class SolicitudController
             fn() => Csrf::validateApi(),
         ]);
 
-        $data   = json_decode(file_get_contents('php://input'), true);
+        $data = json_decode(file_get_contents('php://input'), true);
         $errors = $this->model->validateEstado($data);
 
         if ($errors) {
             Response::validationError($errors);
         }
 
-        $id      = (int) $data['id'];
-        $estado  = $data['estado'];
+        $id = (int) $data['id'];
+        $estado = $data['estado'];
         $updated = $this->model->updateEstado($id, $estado);
 
         if (!$updated) {
