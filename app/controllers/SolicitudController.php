@@ -56,6 +56,67 @@ class SolicitudController
             Response::json($this->model->getCountsByState());
         }
 
+        if (isset($_GET['export']) && $_GET['export'] === 'excel') {
+            $filters = [
+                'estado' => $_GET['estado'] ?? '',
+                'tipo_solicitud' => $_GET['tipo_solicitud'] ?? '',
+                'texto' => $_GET['texto'] ?? '',
+            ];
+            
+            $data = $this->model->getAll($filters, 100000, 0);
+
+            header('Content-Type: application/vnd.ms-excel; charset=UTF-16LE');
+            header('Content-Disposition: attachment; filename="reporte_solicitudes_' . date('Ymd_His') . '.csv"');
+
+            $output = fopen('php://output', 'w');
+            
+            // UTF-16LE BOM
+            fputs($output, chr(255) . chr(254));
+
+            $writeRow = function($row) use ($output) {
+                // Clean tabs and newlines to prevent column breaking in TSV
+                $cleanRow = array_map(function($val) {
+                    return str_replace(["\r", "\n", "\t"], " ", (string)$val);
+                }, $row);
+                
+                $line = implode("\t", $cleanRow) . "\r\n";
+                fputs($output, mb_convert_encoding($line, 'UTF-16LE', 'UTF-8'));
+            };
+
+            $writeRow(['ID', 'Solicitante', 'Correo', 'Tipo Solicitud', 'Estado', 'Descripción', 'Observaciones', 'Fecha Creación', 'Última Edición']);
+
+            $estadoMapping = [
+                'pendiente' => 'Pendiente',
+                'en_revision' => 'En Revisión',
+                'aprobada' => 'Aprobada',
+                'rechazada' => 'Rechazada'
+            ];
+            
+            $tipoMapping = [
+                'academica' => 'Académica',
+                'certificado' => 'Certificado',
+                'actualizacion_datos' => 'Actualización de Datos',
+                'otra' => 'Otra'
+            ];
+
+            foreach ($data as $row) {
+                $writeRow([
+                    $row['id'],
+                    $row['nombre_solicitante'],
+                    $row['correo_electronico'],
+                    $tipoMapping[$row['tipo_solicitud']] ?? $row['tipo_solicitud'],
+                    $estadoMapping[$row['estado']] ?? $row['estado'],
+                    $row['descripcion'],
+                    $row['observaciones'] ?? '',
+                    $row['fecha_creacion'],
+                    $row['fecha_actualizacion']
+                ]);
+            }
+
+            fclose($output);
+            exit;
+        }
+
         if (!empty($_GET['id'])) {
             $id = filter_var($_GET['id'], FILTER_VALIDATE_INT);
             if ($id === false || $id <= 0) {

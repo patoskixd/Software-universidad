@@ -66,7 +66,7 @@ class Solicitud
         $conditions = $this->buildConditions($filters, $params);
 
         $sql = 'SELECT id, nombre_solicitante, correo_electronico,
-                       tipo_solicitud, descripcion, observaciones, estado, fecha_creacion
+                       tipo_solicitud, descripcion, observaciones, estado, fecha_creacion, fecha_actualizacion
                 FROM solicitudes';
 
         if ($conditions) {

@@ -325,6 +325,15 @@ document.addEventListener('DOMContentLoaded', () => {
         cargarSolicitudes();
     });
 
+    document.getElementById('btnExportarExcel').addEventListener('click', () => {
+        const params = new URLSearchParams();
+        if (filtrosActivos.estado) params.set('estado', filtrosActivos.estado);
+        if (filtrosActivos.tipo_solicitud) params.set('tipo_solicitud', filtrosActivos.tipo_solicitud);
+        if (filtrosActivos.texto) params.set('texto', filtrosActivos.texto);
+        params.set('export', 'excel');
+        window.location.href = `${API_URL}?${params.toString()}`;
+    });
+
     document.querySelectorAll('.sortable').forEach(th => {
         th.addEventListener('click', () => {
             const col = th.dataset.sort;

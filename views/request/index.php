@@ -85,7 +85,11 @@
                         placeholder="Nombre o correo…" maxlength="100">
                 </div>
             </div>
-            <div class="col-auto">
+            <div class="col-auto d-flex gap-2">
+                <button type="button" id="btnExportarExcel" class="btn btn-sm btn-success" title="Exportar a Excel">
+                    <i class="bi bi-file-earmark-excel me-1"></i>
+                    <span class="d-none d-sm-inline">Exportar</span>
+                </button>
                 <button type="button" id="btnLimpiarFiltros" class="btn btn-sm btn-outline-secondary"
                     title="Limpiar filtros">
                     <i class="bi bi-x-lg me-1"></i>
