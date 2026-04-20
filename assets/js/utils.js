@@ -1,6 +1,5 @@
 'use strict';
 
-// Escapa HTML para no romper el DOM al insertar datos del servidor
 function escapeHtml(str) {
     if (str == null) return '';
     return String(str)
@@ -11,8 +10,11 @@ function escapeHtml(str) {
         .replace(/'/g,  '&#039;');
 }
 
-// Inserta una alerta Bootstrap en #alertContainer y la elimina tras `duracion` ms
-// duracion = 0 la deja fija hasta que el usuario la cierre
+function getCsrfToken() {
+    return document.querySelector('meta[name="csrf-token"]')?.content ?? '';
+}
+
+// duracion = 0 deja la alerta fija
 function mostrarAlerta(tipo, mensaje, duracion = 5000) {
     const container = document.getElementById('alertContainer');
     const id = 'alert-' + Date.now();

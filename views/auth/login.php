@@ -27,6 +27,7 @@
             <?php endif; ?>
 
             <form method="post" action="login.php" novalidate>
+                <input type="hidden" name="_csrf_token" value="<?= Csrf::token() ?>">
                 <div class="mb-3">
                     <label for="inputCorreoLogin" class="form-label">
                         <i class="bi bi-envelope me-1 text-primary"></i> Correo electrónico

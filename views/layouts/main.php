@@ -17,6 +17,9 @@
         rel="stylesheet"
     >
     <link href="assets/css/style.css" rel="stylesheet">
+    <?php if (class_exists('Csrf')): ?>
+        <meta name="csrf-token" content="<?= Csrf::token() ?>">
+    <?php endif; ?>
 </head>
 <body>
 

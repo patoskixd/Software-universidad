@@ -12,8 +12,16 @@ let sortCol  = 'id';
 let sortDesc = true;
 let paginaActual = 1;
 
-// Wrapper sobre fetch: parsea JSON y lanza el error con los mensajes del servidor
 async function fetchJSON(url, options = {}) {
+    const method = (options.method ?? 'GET').toUpperCase();
+
+    if (method !== 'GET' && method !== 'HEAD') {
+        options.headers = {
+            ...options.headers,
+            'X-CSRF-Token': getCsrfToken(),
+        };
+    }
+
     const res  = await fetch(url, options);
     const data = await res.json();
     if (!res.ok) {

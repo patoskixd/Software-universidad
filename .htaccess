@@ -2,7 +2,7 @@
 # Bloqueo mediante Rewrite
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    
+
     # Si alguien intenta entrar a estas carpetas, lanza un 403 Forbidden
     RewriteRule ^(app|config|core|database|views)(/|$) - [F,L]
 </IfModule>
@@ -14,3 +14,18 @@ Options -Indexes
 <FilesMatch "^(app\.php|app\.example\.php|\.gitignore)$">
     Require all denied
 </FilesMatch>
+
+# Cabeceras de seguridad HTTP
+<IfModule mod_headers.c>
+    # Impide que la página se cargue dentro de un iframe
+    Header always set X-Frame-Options "DENY"
+
+    # Evita que el navegador adivine el Content-Type del recurso
+    Header always set X-Content-Type-Options "nosniff"
+
+    # Solo envia el referer cuando navegamos dentro del mismo sitio
+    Header always set Referrer-Policy "same-origin"
+
+    # Desactiva funcionalidades del navegador que no usamos
+    Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+</IfModule>

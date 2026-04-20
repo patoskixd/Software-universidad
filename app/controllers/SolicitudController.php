@@ -3,6 +3,8 @@
 require_once __DIR__ . '/../core/Database.php';
 require_once __DIR__ . '/../core/Response.php';
 require_once __DIR__ . '/../core/Auth.php';
+require_once __DIR__ . '/../core/Csrf.php';
+require_once __DIR__ . '/../core/Middleware.php';
 require_once __DIR__ . '/../models/Solicitud.php';
 
 class SolicitudController
@@ -39,7 +41,7 @@ class SolicitudController
 
     private function index(): void
     {
-        Auth::requireApi();
+        Middleware::run([fn() => Auth::requireApi()]);
 
         if (!empty($_GET['id'])) {
             $id = filter_var($_GET['id'], FILTER_VALIDATE_INT);
@@ -96,7 +98,10 @@ class SolicitudController
 
     private function updateEstado(): void
     {
-        Auth::requireApi();
+        Middleware::run([
+            fn() => Auth::requireApi(),
+            fn() => Csrf::validateApi(),
+        ]);
 
         $data   = json_decode(file_get_contents('php://input'), true);
         $errors = $this->model->validateEstado($data);

@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/app/core/Auth.php';
+require_once __DIR__ . '/app/core/Csrf.php';
 
 Auth::start();
 
