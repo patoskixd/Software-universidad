@@ -90,19 +90,25 @@ async function consultarSolicitudes(e) {
 
         data.forEach(s => {
             let descCorta = s.descripcion || '';
-            if (descCorta.length > 30) {
-                descCorta = descCorta.substring(0, 30) + '...';
+            if (descCorta.length > 15) {
+                descCorta = descCorta.substring(0, 15) + '...';
             }
             const jsonStr = encodeURIComponent(JSON.stringify(s));
 
             // Fila para escritorio
             filasEscritorio += `
             <tr>
-                <td class="ps-3 fw-medium text-dark">${escapeHtml(s.nombre_solicitante || '')}</td>
                 <td>${escapeHtml(labelTipo(s.tipo_solicitud))}</td>
                 <td><span title="${escapeHtml(s.descripcion || '')}" style="cursor:help;">${escapeHtml(descCorta)}</span></td>
                 <td>${badgeEstado(s.estado)}</td>
                 <td class="text-muted small">${formatFecha(s.fecha_creacion)}</td>
+                <td class="text-muted small">
+                    ${s.observaciones
+                        ? `<span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle" title="${escapeHtml(s.observaciones)}" style="cursor:help;max-width:100px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                               <i class="bi bi-chat-left-dots me-1"></i>${escapeHtml(s.observaciones.length > 12 ? s.observaciones.substring(0,12) + '…' : s.observaciones)}
+                           </span>`
+                        : '<span class="text-muted">—</span>'}
+                </td>
                 <td>
                     <button type="button" class="btn btn-sm btn-outline-primary shadow-sm text-nowrap" onclick="verDescripcionCompleta(this)" data-json="${jsonStr}">
                         <i class="bi bi-eye"></i> Ver
@@ -120,6 +126,7 @@ async function consultarSolicitudes(e) {
                 <div class="d-flex flex-column gap-1 mb-3 small text-muted">
                     <div><i class="bi bi-tag text-secondary me-1"></i> ${escapeHtml(labelTipo(s.tipo_solicitud))}</div>
                     <div><i class="bi bi-calendar3 text-secondary me-1"></i> ${formatFecha(s.fecha_creacion)}</div>
+                    ${s.observaciones ? `<div class="mt-1 p-2 rounded" style="background:#fff3cd;color:#7d5a00;"><i class="bi bi-chat-left-dots-fill me-1"></i><strong>Observaciones:</strong> ${escapeHtml(s.observaciones)}</div>` : ''}
                 </div>
                 <button type="button" class="btn btn-sm btn-outline-primary w-100 shadow-sm" onclick="verDescripcionCompleta(this)" data-json="${jsonStr}">
                     <i class="bi bi-eye"></i> Ver detalle completo
@@ -133,11 +140,11 @@ async function consultarSolicitudes(e) {
                 <table class="table table-hover align-middle mb-0" style="font-size:.9rem;">
                     <thead>
                         <tr>
-                            <th class="ps-3">Solicitante</th>
                             <th>Tipo</th>
                             <th>Descripción</th>
                             <th>Estado</th>
                             <th>Fecha creación</th>
+                            <th>Observaciones</th>
                             <th>Acción</th>
                         </tr>
                     </thead>
@@ -172,6 +179,17 @@ window.verDescripcionCompleta = function (btn) {
     document.getElementById('modalDetalleFecha').textContent = s.fecha_creacion ? formatFecha(s.fecha_creacion) : '-';
     document.getElementById('modalDetalleFechaMod').textContent = s.fecha_actualizacion ? formatFecha(s.fecha_actualizacion) : 'Sin modificaciones recientes';
     document.getElementById('descripcionCompletaTexto').textContent = s.descripcion || 'Sin descripción';
+
+    // Mostrar observaciones del administrador solo si existen
+    const cajaFeedback = document.getElementById('cajaFeedbackUsuario');
+    const feedbackTexto = document.getElementById('feedbackTextoUsuario');
+    if (s.observaciones && s.observaciones.trim() !== '') {
+        feedbackTexto.textContent = s.observaciones;
+        cajaFeedback.classList.remove('d-none');
+    } else {
+        feedbackTexto.textContent = '';
+        cajaFeedback.classList.add('d-none');
+    }
 
     const modalVerDescripcion = new bootstrap.Modal(document.getElementById('modalVerDescripcion'));
     modalVerDescripcion.show();

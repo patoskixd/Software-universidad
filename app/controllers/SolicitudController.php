@@ -52,6 +52,10 @@ class SolicitudController
 
         Middleware::run([fn() => Auth::requireApi()]);
 
+        if (isset($_GET['stats'])) {
+            Response::json($this->model->getCountsByState());
+        }
+
         if (!empty($_GET['id'])) {
             $id = filter_var($_GET['id'], FILTER_VALIDATE_INT);
             if ($id === false || $id <= 0) {
@@ -121,7 +125,13 @@ class SolicitudController
 
         $id = (int) $data['id'];
         $estado = $data['estado'];
-        $updated = $this->model->updateEstado($id, $estado);
+        
+        $observaciones = null;
+        if (in_array($estado, ['aprobada', 'rechazada'], true) && !empty(trim($data['observaciones'] ?? ''))) {
+            $observaciones = trim($data['observaciones']);
+        }
+
+        $updated = $this->model->updateEstado($id, $estado, $observaciones);
 
         if (!$updated) {
             Response::error('Solicitud no encontrada.', 404);

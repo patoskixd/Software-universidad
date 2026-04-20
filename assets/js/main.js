@@ -6,9 +6,9 @@ const API_URL = 'api/solicitudes.php';
 // referencias a los modales Bootstrap, se inicializan en DOMContentLoaded
 let modalNueva, modalEstado, modalDetalle;
 
-let filtrosActivos      = {};
+let filtrosActivos = {};
 let solicitudesActuales = [];
-let sortCol  = 'id';
+let sortCol = 'id';
 let sortDesc = true;
 let paginaActual = 1;
 
@@ -22,7 +22,7 @@ async function fetchJSON(url, options = {}) {
         };
     }
 
-    const res  = await fetch(url, options);
+    const res = await fetch(url, options);
     const data = await res.json();
     if (!res.ok) {
         const messages = Array.isArray(data.errors)
@@ -53,7 +53,7 @@ function renderTabla(solicitudes) {
         }
         return;
     }
-    
+
     tbody.innerHTML = solicitudes.map(buildTableRow).join('');
     if (mbody) {
         mbody.innerHTML = solicitudes.map(buildMobileCard).join('');
@@ -63,29 +63,35 @@ function renderTabla(solicitudes) {
 // Pide el total de cada estado por separado para mostrar en las tarjetas
 async function actualizarStats() {
     const mapaIds = {
-        pendiente:   'statPendiente',
+        pendiente: 'statPendiente',
         en_revision: 'statRevision',
-        aprobada:    'statAprobada',
-        rechazada:   'statRechazada',
+        aprobada: 'statAprobada',
+        rechazada: 'statRechazada',
     };
 
-    await Promise.allSettled(
-        Object.entries(mapaIds).map(async ([estado, elId]) => {
-            try {
-                const r  = await fetchJSON(`${API_URL}?estado=${estado}&limit=1&page=1`);
+    Object.values(mapaIds).forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = '0';
+    });
+
+    try {
+        const data = await fetchJSON(`${API_URL}?stats=1`);
+        data.forEach(item => {
+            const elId = mapaIds[item.estado];
+            if (elId) {
                 const el = document.getElementById(elId);
-                if (el) el.textContent = r.total ?? 0;
-            } catch (_) {}
-        })
-    );
+                if (el) el.textContent = item.total;
+            }
+        });
+    } catch (_) { }
 }
 
 async function cargarSolicitudes(filtros = {}) {
     const params = new URLSearchParams();
-    if (filtros.estado)         params.set('estado',         filtros.estado);
+    if (filtros.estado) params.set('estado', filtros.estado);
     if (filtros.tipo_solicitud) params.set('tipo_solicitud', filtros.tipo_solicitud);
-    if (filtros.texto)          params.set('texto',          filtros.texto);
-    params.set('page',  paginaActual);
+    if (filtros.texto) params.set('texto', filtros.texto);
+    params.set('page', paginaActual);
     params.set('limit', 10);
 
     try {
@@ -100,13 +106,13 @@ async function cargarSolicitudes(filtros = {}) {
 }
 
 function renderPaginacion(info) {
-    const totalEl      = document.getElementById('totalCount');
-    const pagInfo      = document.getElementById('paginationInfo');
+    const totalEl = document.getElementById('totalCount');
+    const pagInfo = document.getElementById('paginationInfo');
     const pagContainer = document.getElementById('paginationContainer');
 
     if (!info.total) {
-        totalEl.textContent   = '0 solicitudes';
-        if (pagInfo)      pagInfo.textContent   = 'No hay resultados';
+        totalEl.textContent = '0 solicitudes';
+        if (pagInfo) pagInfo.textContent = 'No hay resultados';
         if (pagContainer) pagContainer.innerHTML = '';
         return;
     }
@@ -117,7 +123,7 @@ function renderPaginacion(info) {
 
     if (pagInfo) {
         const start = (page - 1) * limit + 1;
-        const end   = Math.min(page * limit, total);
+        const end = Math.min(page * limit, total);
         pagInfo.textContent = `Mostrando ${start} a ${end} de ${total} resultados`;
     }
 
@@ -175,8 +181,8 @@ function aplicarOrden() {
             valB = valB.toString().toLowerCase();
         }
 
-        if (valA < valB) return sortDesc ? 1  : -1;
-        if (valA > valB) return sortDesc ? -1 :  1;
+        if (valA < valB) return sortDesc ? 1 : -1;
+        if (valA > valB) return sortDesc ? -1 : 1;
         return 0;
     });
 
@@ -210,28 +216,38 @@ async function verDetalle(id) {
     }
 }
 
-function abrirModalEstado(id, nombre, estadoActual) {
-    document.getElementById('updateId').value                = id;
+function abrirModalEstado(id, nombre, estadoActual, observacionesAnteriores) {
+    document.getElementById('updateId').value = id;
     document.getElementById('updateNombreDisplay').textContent = nombre;
-    document.getElementById('updateEstado').value            = estadoActual;
+    
+    const selEstado = document.getElementById('updateEstado');
+    selEstado.value = estadoActual;
+    
+    const areaObs = document.getElementById('updateObservaciones');
+    areaObs.value = observacionesAnteriores ?? '';
+    
+    // Disparar evento change manualmente para ocultar/mostrar el contenedor
+    selEstado.dispatchEvent(new Event('change'));
+
     modalEstado.show();
 }
 
 async function guardarEstado(e) {
     e.preventDefault();
 
-    const id     = parseInt(document.getElementById('updateId').value, 10);
+    const id = parseInt(document.getElementById('updateId').value, 10);
     const estado = document.getElementById('updateEstado').value;
-    const btn    = document.getElementById('btnGuardarEstado');
+    const obs = document.getElementById('updateObservaciones').value;
+    const btn = document.getElementById('btnGuardarEstado');
 
-    btn.disabled  = true;
+    btn.disabled = true;
     btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Guardando…';
 
     try {
         await fetchJSON(API_URL, {
-            method:  'PATCH',
+            method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify({ id, estado }),
+            body: JSON.stringify({ id, estado, observaciones: obs }),
         });
         modalEstado.hide();
         mostrarAlerta('success', 'Estado actualizado correctamente.');
@@ -239,7 +255,7 @@ async function guardarEstado(e) {
     } catch (err) {
         mostrarAlerta('danger', err.messages?.[0] ?? 'Error al actualizar el estado.');
     } finally {
-        btn.disabled  = false;
+        btn.disabled = false;
         btn.innerHTML = '<i class="bi bi-check-lg me-1"></i> Guardar Cambio';
     }
 }
@@ -247,9 +263,9 @@ async function guardarEstado(e) {
 async function enviarNuevaSolicitud(e) {
     e.preventDefault();
 
-    const form   = document.getElementById('formNuevaSolicitud');
+    const form = document.getElementById('formNuevaSolicitud');
     const errBox = document.getElementById('erroresNueva');
-    const btn    = document.getElementById('btnEnviarSolicitud');
+    const btn = document.getElementById('btnEnviarSolicitud');
 
     errBox.classList.add('d-none');
     errBox.querySelector('.lista-errores').innerHTML = '';
@@ -257,18 +273,18 @@ async function enviarNuevaSolicitud(e) {
     const payload = {
         nombre_solicitante: form.nombre_solicitante.value.trim(),
         correo_electronico: form.correo_electronico.value.trim(),
-        tipo_solicitud:     form.tipo_solicitud.value,
-        descripcion:        form.descripcion.value.trim(),
+        tipo_solicitud: form.tipo_solicitud.value,
+        descripcion: form.descripcion.value.trim(),
     };
 
-    btn.disabled  = true;
+    btn.disabled = true;
     btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Enviando…';
 
     try {
         await fetchJSON(API_URL, {
-            method:  'POST',
+            method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify(payload),
+            body: JSON.stringify(payload),
         });
         modalNueva.hide();
         form.reset();
@@ -283,14 +299,14 @@ async function enviarNuevaSolicitud(e) {
         });
         errBox.classList.remove('d-none');
     } finally {
-        btn.disabled  = false;
+        btn.disabled = false;
         btn.innerHTML = '<i class="bi bi-send me-1"></i> Enviar Solicitud';
     }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    modalNueva   = new bootstrap.Modal(document.getElementById('modalNuevaSolicitud'));
-    modalEstado  = new bootstrap.Modal(document.getElementById('modalActualizarEstado'));
+    modalNueva = new bootstrap.Modal(document.getElementById('modalNuevaSolicitud'));
+    modalEstado = new bootstrap.Modal(document.getElementById('modalActualizarEstado'));
     modalDetalle = new bootstrap.Modal(document.getElementById('modalDetalle'));
 
     document.getElementById('formNuevaSolicitud').addEventListener('submit', enviarNuevaSolicitud);
@@ -316,16 +332,27 @@ document.addEventListener('DOMContentLoaded', () => {
             abrirModalEstado(
                 parseInt(btnEstado.dataset.id, 10),
                 btnEstado.dataset.nombre,
-                btnEstado.dataset.estado
+                btnEstado.dataset.estado,
+                btnEstado.dataset.observaciones
             );
+        }
+    });
+
+    document.getElementById('updateEstado').addEventListener('change', e => {
+        const estado = e.target.value;
+        const cont = document.getElementById('contenedorObservaciones');
+        if (estado === 'aprobada' || estado === 'rechazada') {
+            cont.classList.remove('d-none');
+        } else {
+            cont.classList.add('d-none');
         }
     });
 
     const aplicarFiltros = () => {
         filtrosActivos = {
-            estado:         document.getElementById('filterEstado').value,
+            estado: document.getElementById('filterEstado').value,
             tipo_solicitud: document.getElementById('filterTipo').value,
-            texto:          document.getElementById('filterTexto').value.trim(),
+            texto: document.getElementById('filterTexto').value.trim(),
         };
         paginaActual = 1;
         cargarSolicitudes(filtrosActivos);
@@ -344,10 +371,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('btnLimpiarFiltros').addEventListener('click', () => {
         document.getElementById('filterEstado').value = '';
-        document.getElementById('filterTipo').value   = '';
-        document.getElementById('filterTexto').value  = '';
+        document.getElementById('filterTipo').value = '';
+        document.getElementById('filterTexto').value = '';
         filtrosActivos = {};
-        paginaActual   = 1;
+        paginaActual = 1;
         cargarSolicitudes();
     });
 
@@ -357,7 +384,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (sortCol === col) {
                 sortDesc = !sortDesc;
             } else {
-                sortCol  = col;
+                sortCol = col;
                 // id y fecha muestran los más recientes primero por defecto
                 sortDesc = col === 'id' || col === 'fecha_creacion';
             }

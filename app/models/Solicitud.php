@@ -53,13 +53,20 @@ class Solicitud
         return (int) $stmt->fetchColumn();
     }
 
+    public function getCountsByState(): array
+    {
+        $sql = 'SELECT estado, COUNT(*) as total FROM solicitudes GROUP BY estado';
+        $stmt = $this->pdo->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function getAll(array $filters = [], int $limit = 10, int $offset = 0): array
     {
         $params     = [];
         $conditions = $this->buildConditions($filters, $params);
 
         $sql = 'SELECT id, nombre_solicitante, correo_electronico,
-                       tipo_solicitud, descripcion, estado, fecha_creacion
+                       tipo_solicitud, descripcion, observaciones, estado, fecha_creacion
                 FROM solicitudes';
 
         if ($conditions) {
@@ -77,7 +84,7 @@ class Solicitud
     public function getByCorreo(string $correo): array
     {
         $stmt = $this->pdo->prepare(
-            'SELECT id, nombre_solicitante, correo_electronico, tipo_solicitud, descripcion, estado, fecha_creacion, fecha_actualizacion
+            'SELECT id, nombre_solicitante, correo_electronico, tipo_solicitud, descripcion, observaciones, estado, fecha_creacion, fecha_actualizacion
              FROM solicitudes
              WHERE correo_electronico = ?
              ORDER BY fecha_creacion DESC'
@@ -114,10 +121,10 @@ class Solicitud
         return (int) $this->pdo->lastInsertId();
     }
 
-    public function updateEstado(int $id, string $estado): bool
+    public function updateEstado(int $id, string $estado, ?string $observaciones = null): bool
     {
-        $stmt = $this->pdo->prepare('UPDATE solicitudes SET estado = ? WHERE id = ?');
-        $stmt->execute([$estado, $id]);
+        $stmt = $this->pdo->prepare('UPDATE solicitudes SET estado = ?, observaciones = ? WHERE id = ?');
+        $stmt->execute([$estado, $observaciones, $id]);
 
         return $stmt->rowCount() > 0;
     }
@@ -182,6 +189,13 @@ class Solicitud
         $estado = $data['estado'] ?? '';
         if (!in_array($estado, self::ESTADOS_VALIDOS, true)) {
             $errors[] = 'Estado no válido. Valores permitidos: ' . implode(', ', self::ESTADOS_VALIDOS) . '.';
+        }
+
+        if (in_array($estado, ['aprobada', 'rechazada'], true)) {
+            $observaciones = trim($data['observaciones'] ?? '');
+            if ($observaciones !== '' && mb_strlen($observaciones) > 2000) {
+                $errors[] = 'Las observaciones no pueden superar los 2000 caracteres.';
+            }
         }
 
         return $errors;

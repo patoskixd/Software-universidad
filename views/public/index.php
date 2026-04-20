@@ -149,7 +149,7 @@
 
 <!-- Modal ver descripcion -->
 <div class="modal fade" id="modalVerDescripcion" tabindex="-1" aria-labelledby="modalVerDescripcionLabel">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
         <div class="modal-content shadow-lg border-0 rounded-4">
             <div class="modal-header border-bottom-0 pb-0">
                 <h5 class="modal-title d-flex align-items-center gap-2 fw-semibold text-primary"
@@ -162,6 +162,7 @@
             </div>
             <div class="modal-body p-4 text-start bg-light">
                 <div class="row g-4">
+
                     <div class="col-md-6">
                         <label class="text-muted small fw-bold text-uppercase d-flex align-items-center gap-2 mb-1"
                             style="font-size: 0.75rem;">
@@ -210,7 +211,7 @@
                         <div id="modalDetalleFechaMod" class="text-dark fs-6" style="letter-spacing: 0.3px;"></div>
                     </div>
 
-                    <div class="col-12 mt-4 pt-2">
+                    <div class="col-12">
                         <label class="text-muted small fw-bold text-uppercase d-flex align-items-center gap-2 mb-2"
                             style="font-size: 0.75rem;">
                             <i class="bi bi-chat-left-text text-secondary"></i> Descripción
@@ -220,6 +221,24 @@
                                 style="white-space: pre-wrap; font-size: 0.95rem; line-height: 1.6;"></p>
                         </div>
                     </div>
+
+                    <!-- obsevaciones (visible solo si existe) -->
+                    <div id="cajaFeedbackUsuario" class="col-12 d-none">
+                        <div class="p-3 rounded-3 border"
+                            style="background: linear-gradient(135deg, #fff8f0 0%, #fff3cd 100%); border-color: #ffc107 !important;">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="bi bi-chat-left-dots-fill text-warning fs-5"></i>
+                                <span class="fw-bold text-dark"
+                                    style="font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                                    Observaciones
+                                </span>
+                            </div>
+                            <p id="feedbackTextoUsuario" class="mb-0 text-dark"
+                                style="white-space: pre-wrap; word-break: break-word; overflow-wrap: anywhere; font-size: 0.95rem; line-height: 1.6;">
+                            </p>
+                        </div>
+                    </div>
+
                 </div>
             </div>
             <div class="modal-footer border-top-0 pt-0 bg-light rounded-bottom-4">

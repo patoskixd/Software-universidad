@@ -54,7 +54,8 @@ function buildTableRow(s) {
                     title="Cambiar estado"
                     data-id="${s.id}"
                     data-nombre="${escapeHtml(s.nombre_solicitante)}"
-                    data-estado="${s.estado}">
+                    data-estado="${s.estado}"
+                    data-observaciones="${escapeHtml((s.observaciones || ''))}">
                     <i class="bi bi-pencil"></i>
                 </button>
             </td>
@@ -113,7 +114,17 @@ function buildDetalleHtml(s) {
                     </div>
                 </div>
             </div>
-        </div>`;
+        </div>
+        ${s.observaciones ? `
+        <div class="col-12 mt-3">
+            <div class="detail-item mb-0">
+                <div class="detail-label text-primary"><i class="bi bi-chat-left-dots-fill me-1"></i>Observaciones / Feedback</div>
+                <div class="detail-value text-pre-wrap p-3 bg-white rounded border border-primary-subtle" style="font-size:.9rem;">
+                    ${escapeHtml(s.observaciones)}
+                </div>
+            </div>
+        </div>` : ''}
+    </div>`;
 }
 
 // Tarjeta movil para la tabla de administración
@@ -138,7 +149,8 @@ function buildMobileCard(s) {
                 <button class="btn btn-sm btn-outline-primary flex-fill btn-cambiar-estado"
                     data-id="${s.id}"
                     data-nombre="${escapeHtml(s.nombre_solicitante)}"
-                    data-estado="${s.estado}">
+                    data-estado="${s.estado}"
+                    data-observaciones="${escapeHtml((s.observaciones || ''))}">
                     <i class="bi bi-pencil"></i> Estado
                 </button>
             </div>
