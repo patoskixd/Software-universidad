@@ -1,14 +1,16 @@
-# Denegar acceso directo a carpetas internas
+
+# Bloqueo mediante Rewrite
 <IfModule mod_rewrite.c>
     RewriteEngine On
-
-    # Bloquear acceso web a config/, app/ y database/
-    RewriteRule ^(config|app|database)(/|$) - [F,L]
+    
+    # Si alguien intenta entrar a estas carpetas, lanza un 403 Forbidden
+    RewriteRule ^(api|app|config|core|database|views)(/|$) - [F,L]
 </IfModule>
 
-# Fallback para servidores sin mod_rewrite
-<FilesMatch "\.(php)$">
-    <If "%{REQUEST_URI} =~ m|^/(config|app|database)/|">
-        Require all denied
-    </If>
+# Seguridad Extra impedir que se listen archivos en carpetas vacias
+Options -Indexes
+
+# Bloqueo de archivos de configuracion especificos
+<FilesMatch "^(app\.php|app\.example\.php|\.gitignore)$">
+    Require all denied
 </FilesMatch>
