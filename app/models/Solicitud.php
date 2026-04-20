@@ -124,12 +124,16 @@ class Solicitud
             $errors[] = 'El nombre completo es obligatorio.';
         } elseif (mb_strlen($nombre) > 150) {
             $errors[] = 'El nombre no puede superar los 150 caracteres.';
+        } elseif (!preg_match('/^[\p{L}\p{M}\s\'\-\.]+$/u', $nombre)) {
+            $errors[] = 'El nombre solo puede contener letras, espacios y guiones.';
         }
 
         // Correo
         $correo = trim($data['correo_electronico'] ?? '');
         if ($correo === '') {
             $errors[] = 'El correo electrónico es obligatorio.';
+        } elseif (mb_strlen($correo) > 150) {
+            $errors[] = 'El correo no puede superar los 150 caracteres.';
         } elseif (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
             $errors[] = 'El formato del correo electrónico no es válido.';
         }
@@ -143,6 +147,8 @@ class Solicitud
         $descripcion = trim($data['descripcion'] ?? '');
         if ($descripcion === '' || mb_strlen($descripcion) < 10) {
             $errors[] = 'La descripción es obligatoria, mínimo 10 caracteres.';
+        } elseif (mb_strlen($descripcion) > 2000) {
+            $errors[] = 'La descripción no puede superar los 2000 caracteres.';
         }
 
         return $errors;

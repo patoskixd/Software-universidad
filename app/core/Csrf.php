@@ -17,7 +17,7 @@ class Csrf
         return $_SESSION[self::KEY];
     }
 
-    // hash_equals evita timing attacks (=== se detiene en el primer carácter distinto)
+    // hash_equals evita timing attacks (=== se detiene en el primer caracter distinto)
     public static function validate(string $token): bool
     {
         if (session_status() === PHP_SESSION_NONE) {
