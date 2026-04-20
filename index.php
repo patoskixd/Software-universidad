@@ -5,7 +5,7 @@ require_once __DIR__ . '/app/core/Auth.php';
 Auth::start();
 
 $pageTitle   = 'Nueva solicitud';
-$pageScript  = 'assets/js/public.js';
+$pageScripts = ['assets/js/utils.js', 'assets/js/public.js'];
 $adminActual = Auth::user();
 
 ob_start();

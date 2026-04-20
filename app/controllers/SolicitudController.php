@@ -1,9 +1,9 @@
 <?php
 
-require_once __DIR__ . '/../Core/Database.php';
-require_once __DIR__ . '/../Core/Response.php';
-require_once __DIR__ . '/../Core/Auth.php';
-require_once __DIR__ . '/../Models/Solicitud.php';
+require_once __DIR__ . '/../core/Database.php';
+require_once __DIR__ . '/../core/Response.php';
+require_once __DIR__ . '/../core/Auth.php';
+require_once __DIR__ . '/../models/Solicitud.php';
 
 class SolicitudController
 {

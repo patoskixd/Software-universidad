@@ -121,7 +121,7 @@ class Solicitud
         // Nombre
         $nombre = trim($data['nombre_solicitante'] ?? '');
         if ($nombre === '' || mb_strlen($nombre) < 2) {
-            $errors[] = 'El nombre completo es obligatorio (mínimo 2 caracteres).';
+            $errors[] = 'El nombre completo es obligatorio.';
         } elseif (mb_strlen($nombre) > 150) {
             $errors[] = 'El nombre no puede superar los 150 caracteres.';
         }
@@ -142,7 +142,7 @@ class Solicitud
         // Descripción
         $descripcion = trim($data['descripcion'] ?? '');
         if ($descripcion === '' || mb_strlen($descripcion) < 10) {
-            $errors[] = 'La descripción es obligatoria (mínimo 10 caracteres).';
+            $errors[] = 'La descripción es obligatoria, mínimo 10 caracteres.';
         }
 
         return $errors;

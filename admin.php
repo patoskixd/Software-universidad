@@ -5,7 +5,7 @@ require_once __DIR__ . '/app/core/Auth.php';
 Auth::requireWeb();
 
 $pageTitle   = 'Gestión de Solicitudes';
-$pageScript  = 'assets/js/main.js';
+$pageScripts = ['assets/js/utils.js', 'assets/js/templates.js', 'assets/js/main.js'];
 $adminActual = Auth::user();
 
 ob_start();

@@ -1,32 +1,7 @@
 'use strict';
+// Depende de: utils.js (debe cargarse antes)
 
 const API_URL = 'api/solicitudes.php';
-
-function escapeHtml(str) {
-    if (str == null) return '';
-    return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-}
-
-function mostrarAlerta(tipo, mensaje, duracion = 6000) {
-    const container = document.getElementById('alertContainer');
-    const id = 'alert-' + Date.now();
-
-    container.insertAdjacentHTML('beforeend', `
-        <div id="${id}" class="alert alert-${tipo} alert-dismissible fade show" role="alert">
-            ${escapeHtml(mensaje)}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-        </div>
-    `);
-
-    if (duracion > 0) {
-        setTimeout(() => document.getElementById(id)?.remove(), duracion);
-    }
-}
 
 async function enviarSolicitud(e) {
     e.preventDefault();
@@ -49,7 +24,7 @@ async function enviarSolicitud(e) {
     btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Enviando…';
 
     try {
-        const res = await fetch(API_URL, {
+        const res  = await fetch(API_URL, {
             method:  'POST',
             headers: { 'Content-Type': 'application/json' },
             body:    JSON.stringify(payload),
@@ -70,7 +45,7 @@ async function enviarSolicitud(e) {
 
         form.reset();
         mostrarAlerta('success', 'Solicitud enviada correctamente. Recibirá respuesta en su correo.');
-    } catch (err) {
+    } catch (_) {
         mostrarAlerta('danger', 'No se pudo enviar la solicitud. Intente más tarde.');
     } finally {
         btn.disabled  = false;
@@ -79,6 +54,5 @@ async function enviarSolicitud(e) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('formPublica')
-        .addEventListener('submit', enviarSolicitud);
+    document.getElementById('formPublica').addEventListener('submit', enviarSolicitud);
 });

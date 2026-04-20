@@ -8,7 +8,7 @@ return [
         'pass'    => 'TU_CONTRASEÑA_AQUI',
         'charset' => 'utf8mb4',
     ],
-        'app' => [
+    'app' => [
         'name'     => 'Sistema de Solicitudes Administrativas',
         'timezone' => 'America/Santiago',
     ],
