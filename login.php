@@ -40,6 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     RateLimit::record($pdo, $ip);
                     $error = 'Credenciales inválidas.';
                 } else {
+                    RateLimit::cleanup($pdo);
                     Auth::login($admin);
                     header('Location: admin.php');
                     exit;

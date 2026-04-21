@@ -102,12 +102,12 @@ class Solicitud
         return $row ?: null;
     }
 
-    public function create(array $data): int
+    public function create(array $data, ?string $ip = null): int
     {
         $stmt = $this->pdo->prepare(
             'INSERT INTO solicitudes
-                 (nombre_solicitante, correo_electronico, tipo_solicitud, descripcion, estado)
-             VALUES (?, ?, ?, ?, ?)'
+                 (nombre_solicitante, correo_electronico, tipo_solicitud, descripcion, ip_solicitante, estado)
+             VALUES (?, ?, ?, ?, ?, ?)'
         );
 
         $stmt->execute([
@@ -115,6 +115,7 @@ class Solicitud
             strtolower(trim($data['correo_electronico'])),
             $data['tipo_solicitud'],
             trim($data['descripcion']),
+            $ip,
             'pendiente',
         ]);
 

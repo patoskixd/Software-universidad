@@ -5,6 +5,7 @@ require_once __DIR__ . '/../core/Response.php';
 require_once __DIR__ . '/../core/Auth.php';
 require_once __DIR__ . '/../core/Csrf.php';
 require_once __DIR__ . '/../core/Middleware.php';
+require_once __DIR__ . '/../core/RateLimit.php';
 require_once __DIR__ . '/../models/Solicitud.php';
 
 class SolicitudController
@@ -137,8 +138,8 @@ class SolicitudController
             'texto' => $_GET['texto'] ?? '',
         ];
 
-        $page = max(1, (int) ($_GET['page'] ?? 1));
-        $limit = max(1, (int) ($_GET['limit'] ?? 10)); // Default 10 rows
+        $page   = max(1, (int) ($_GET['page'] ?? 1));
+        $limit  = min(100, max(1, (int) ($_GET['limit'] ?? 10)));
         $offset = ($page - 1) * $limit;
 
         $total = $this->model->getTotal($filters);
@@ -155,14 +156,21 @@ class SolicitudController
 
     private function store(): void
     {
-        $data = json_decode(file_get_contents('php://input'), true);
+        $ip  = RateLimit::clientIp();
+        $pdo = Database::getInstance();
+
+        if (!RateLimit::checkSolicitud($pdo, $ip)) {
+            Response::error('Demasiadas solicitudes. Espere un momento antes de intentarlo nuevamente.', 429);
+        }
+
+        $data   = json_decode(file_get_contents('php://input'), true);
         $errors = $this->model->validate($data);
 
         if ($errors) {
             Response::validationError($errors);
         }
 
-        $id = $this->model->create($data);
+        $id = $this->model->create($data, $ip);
 
         Response::json([
             'id' => $id,
