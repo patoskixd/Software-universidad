@@ -7,6 +7,13 @@ class Solicitud
     public const TIPOS_VALIDOS = ['academica', 'certificado', 'actualizacion_datos', 'otra'];
     public const ESTADOS_VALIDOS = ['pendiente', 'en_revision', 'aprobada', 'rechazada'];
 
+    private const VALID_TRANSITIONS = [
+        'pendiente'   => ['en_revision', 'aprobada', 'rechazada'],
+        'en_revision' => ['pendiente', 'aprobada', 'rechazada'],
+        'aprobada'    => [],
+        'rechazada'   => [],
+    ];
+
     public function __construct(PDO $pdo)
     {
         $this->pdo = $pdo;
@@ -122,14 +129,21 @@ class Solicitud
         return (int) $this->pdo->lastInsertId();
     }
 
-    public function updateEstado(int $id, string $estado, ?string $observaciones = null): bool
+    public function updateEstado(int $id, string $estado, ?string $observaciones = null): ?bool
     {
+        $current = $this->getById($id);
+
+        if ($current === null) {
+            return null;
+        }
+
+        $allowed = self::VALID_TRANSITIONS[$current['estado']] ?? [];
+        if (!in_array($estado, $allowed, true)) {
+            return false;
+        }
+
         $stmt = $this->pdo->prepare('UPDATE solicitudes SET estado = ?, observaciones = ? WHERE id = ?');
         $stmt->execute([$estado, $observaciones, $id]);
-
-        if ($stmt->rowCount() === 0) {
-            return $this->getById($id) !== null;
-        }
 
         return true;
     }

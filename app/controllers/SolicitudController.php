@@ -200,10 +200,14 @@ class SolicitudController
             $observaciones = trim($data['observaciones']);
         }
 
-        $updated = $this->model->updateEstado($id, $estado, $observaciones);
+        $result = $this->model->updateEstado($id, $estado, $observaciones);
 
-        if (!$updated) {
+        if ($result === null) {
             Response::error('Solicitud no encontrada.', 404);
+        }
+
+        if ($result === false) {
+            Response::error('Transición no permitida. Las solicitudes aprobadas o rechazadas son estados finales y no pueden modificarse.', 422);
         }
 
         Response::json(['message' => 'Estado actualizado exitosamente.']);
