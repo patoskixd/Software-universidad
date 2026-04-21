@@ -68,30 +68,30 @@ function buildTableRow(s) {
 // Contenido del modal de ver detalle
 function buildDetalleHtml(s) {
     return `
-        <div class="row g-3">
+        <div class="row g-2">
             <div class="col-sm-6">
                 <div class="detail-item">
-                    <div class="detail-label"><i class="bi bi-hash me-1"></i>ID</div>
-                    <div class="detail-value fw-semibold">#${s.id}</div>
+                    <div class="detail-label"><i class="bi bi-hash"></i>ID</div>
+                    <div class="detail-value">#${s.id}</div>
                 </div>
             </div>
             <div class="col-sm-6">
                 <div class="detail-item">
-                    <div class="detail-label"><i class="bi bi-tag me-1"></i>Tipo</div>
+                    <div class="detail-label"><i class="bi bi-tag"></i>Tipo</div>
                     <div class="detail-value">${labelTipo(s.tipo_solicitud)}</div>
                 </div>
             </div>
             <div class="col-sm-6">
                 <div class="detail-item">
-                    <div class="detail-label"><i class="bi bi-person me-1"></i>Solicitante</div>
-                    <div class="detail-value fw-semibold">${escapeHtml(s.nombre_solicitante)}</div>
+                    <div class="detail-label"><i class="bi bi-person"></i>Solicitante</div>
+                    <div class="detail-value">${escapeHtml(s.nombre_solicitante)}</div>
                 </div>
             </div>
             <div class="col-sm-6">
                 <div class="detail-item">
-                    <div class="detail-label"><i class="bi bi-envelope me-1"></i>Correo</div>
+                    <div class="detail-label"><i class="bi bi-envelope"></i>Correo</div>
                     <div class="detail-value">
-                        <a href="mailto:${escapeHtml(s.correo_electronico)}" class="text-decoration-none">
+                        <a href="mailto:${escapeHtml(s.correo_electronico)}" class="text-decoration-none" style="color:var(--blue);">
                             ${escapeHtml(s.correo_electronico)}
                         </a>
                     </div>
@@ -99,35 +99,26 @@ function buildDetalleHtml(s) {
             </div>
             <div class="col-sm-6">
                 <div class="detail-item">
-                    <div class="detail-label"><i class="bi bi-circle-fill me-1"></i>Estado</div>
+                    <div class="detail-label"><i class="bi bi-circle-fill"></i>Estado</div>
                     <div class="detail-value">${badgeEstado(s.estado)}</div>
                 </div>
             </div>
             <div class="col-sm-6">
                 <div class="detail-item">
-                    <div class="detail-label"><i class="bi bi-calendar me-1"></i>Fecha</div>
+                    <div class="detail-label"><i class="bi bi-calendar"></i>Fecha</div>
                     <div class="detail-value">${formatFecha(s.fecha_creacion)}</div>
                 </div>
             </div>
             <div class="col-12">
-                <div class="detail-item mb-0">
-                    <div class="detail-label"><i class="bi bi-chat-left-text me-1"></i>Descripción</div>
-                    <div class="detail-value text-pre-wrap p-3 bg-light rounded border" style="font-size:.9rem;">
-                        ${escapeHtml(s.descripcion)}
-                    </div>
-                </div>
+                <div class="detail-label mb-1"><i class="bi bi-chat-left-text"></i>Descripción</div>
+                <div class="detail-desc">${escapeHtml(s.descripcion)}</div>
             </div>
-        </div>
-        ${s.observaciones ? `
-        <div class="col-12 mt-3">
-            <div class="detail-item mb-0">
-                <div class="detail-label text-primary"><i class="bi bi-chat-left-dots-fill me-1"></i>Observaciones</div>
-                <div class="detail-value text-pre-wrap p-3 bg-white rounded border border-primary-subtle" style="font-size:.9rem;">
-                    ${escapeHtml(s.observaciones)}
-                </div>
-            </div>
-        </div>` : ''}
-    </div>`;
+            ${s.observaciones ? `
+            <div class="col-12">
+                <div class="detail-label mb-1"><i class="bi bi-chat-left-dots"></i>Observaciones</div>
+                <div class="detail-obs">${escapeHtml(s.observaciones)}</div>
+            </div>` : ''}
+        </div>`;
 }
 
 // Tarjeta movil para la tabla de administración

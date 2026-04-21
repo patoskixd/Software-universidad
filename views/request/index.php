@@ -23,6 +23,7 @@
 <div class="row g-3 mb-4" id="statsRow">
     <div class="col-6 col-md-3">
         <div class="stat-card stat-pending">
+            <div class="stat-top-line"></div>
             <i class="bi bi-hourglass-split stat-icon"></i>
             <span class="stat-number" id="statPendiente">–</span>
             <span class="stat-label">Pendientes</span>
@@ -30,6 +31,7 @@
     </div>
     <div class="col-6 col-md-3">
         <div class="stat-card stat-review">
+            <div class="stat-top-line"></div>
             <i class="bi bi-eye stat-icon"></i>
             <span class="stat-number" id="statRevision">–</span>
             <span class="stat-label">En Revisión</span>
@@ -37,6 +39,7 @@
     </div>
     <div class="col-6 col-md-3">
         <div class="stat-card stat-approved">
+            <div class="stat-top-line"></div>
             <i class="bi bi-check-circle stat-icon"></i>
             <span class="stat-number" id="statAprobada">–</span>
             <span class="stat-label">Aprobadas</span>
@@ -44,6 +47,7 @@
     </div>
     <div class="col-6 col-md-3">
         <div class="stat-card stat-rejected">
+            <div class="stat-top-line"></div>
             <i class="bi bi-x-circle stat-icon"></i>
             <span class="stat-number" id="statRechazada">–</span>
             <span class="stat-label">Rechazadas</span>
@@ -54,9 +58,13 @@
 <!-- Filtros -->
 <div class="card filter-card mb-4">
     <div class="card-body">
-        <form id="filterForm" class="row g-2 align-items-end">
+        <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom">
+            <i class="bi bi-funnel-fill" style="color:var(--blue);font-size:.85rem;"></i>
+            <span style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--sub);">Filtrar solicitudes</span>
+        </div>
+        <form id="filterForm" class="row g-3 align-items-end">
             <div class="col-sm-6 col-md-3">
-                <label for="filterEstado" class="form-label">Estado</label>
+                <label for="filterEstado" class="detail-label mb-1"><i class="bi bi-circle-fill"></i>Estado</label>
                 <select id="filterEstado" class="form-select form-select-sm">
                     <option value="">Todos los estados</option>
                     <option value="pendiente">Pendiente</option>
@@ -66,7 +74,7 @@
                 </select>
             </div>
             <div class="col-sm-6 col-md-3">
-                <label for="filterTipo" class="form-label">Tipo</label>
+                <label for="filterTipo" class="detail-label mb-1"><i class="bi bi-tag"></i>Tipo</label>
                 <select id="filterTipo" class="form-select form-select-sm">
                     <option value="">Todos los tipos</option>
                     <option value="academica">Académica</option>
@@ -75,23 +83,17 @@
                     <option value="otra">Otra</option>
                 </select>
             </div>
-            <div class="col-md-4">
-                <label for="filterTexto" class="form-label">Búsqueda</label>
-                <div class="input-group input-group-sm">
-                    <span class="input-group-text bg-white border-end-0 text-muted">
-                        <i class="bi bi-search"></i>
-                    </span>
-                    <input type="text" id="filterTexto" class="form-control border-start-0 ps-0"
-                        placeholder="Nombre o correo…" maxlength="100">
-                </div>
+            <div class="col-sm-12 col-md-4">
+                <label for="filterTexto" class="detail-label mb-1"><i class="bi bi-search"></i>Búsqueda</label>
+                <input type="text" id="filterTexto" class="form-control form-control-sm"
+                    placeholder="Nombre o correo…" maxlength="100">
             </div>
-            <div class="col-auto d-flex gap-2">
-                <button type="button" id="btnExportarExcel" class="btn btn-sm btn-success" title="Exportar a Excel">
+            <div class="col-sm-12 col-md-2 d-flex gap-2 justify-content-md-end">
+                <button type="button" id="btnExportarExcel" class="btn btn-sm btn-success flex-grow-1 flex-md-grow-0" title="Exportar a Excel">
                     <i class="bi bi-file-earmark-excel me-1"></i>
                     <span class="d-none d-sm-inline">Exportar</span>
                 </button>
-                <button type="button" id="btnLimpiarFiltros" class="btn btn-sm btn-outline-secondary"
-                    title="Limpiar filtros">
+                <button type="button" id="btnLimpiarFiltros" class="btn btn-sm btn-outline-secondary flex-grow-1 flex-md-grow-0" title="Limpiar filtros">
                     <i class="bi bi-x-lg me-1"></i>
                     <span class="d-none d-sm-inline">Limpiar</span>
                 </button>
@@ -155,33 +157,42 @@
 <div class="modal fade" id="modalActualizarEstado" tabindex="-1" aria-labelledby="modalActualizarEstadoLabel">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header bg-primary">
                 <h5 class="modal-title" id="modalActualizarEstadoLabel">
-                    <i class="bi bi-pencil-square me-2 text-primary"></i>Actualizar Estado
+                    <i class="bi bi-pencil-square me-2"></i>Actualizar Estado
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"
                     onclick="this.blur()"></button>
             </div>
             <form id="formActualizarEstado">
                 <div class="modal-body">
                     <input type="hidden" id="updateId">
-                    <div class="alert alert-info mb-3">
-                        <i class="bi bi-person me-1"></i>
-                        Solicitud de: <strong id="updateNombreDisplay"></strong>
+                    <div class="d-flex align-items-center gap-2 p-3 mb-3 rounded" style="background:#f0f6ff;border:1px solid #bfdbfe;">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                            style="width:34px;height:34px;background:var(--blue);color:#fff;">
+                            <i class="bi bi-person-fill" style="font-size:.9rem;"></i>
+                        </div>
+                        <div class="lh-sm">
+                            <div style="font-size:.67rem;text-transform:uppercase;letter-spacing:.08em;color:var(--blue);font-weight:700;">Solicitante</div>
+                            <div class="fw-semibold" style="font-size:.95rem;color:var(--txt);" id="updateNombreDisplay"></div>
+                        </div>
                     </div>
-                    <label for="updateEstado" class="form-label fw-semibold">
-                        Nuevo Estado <span class="text-danger">*</span>
-                    </label>
-                    <select id="updateEstado" class="form-select" required>
-                        <option value="pendiente">Pendiente</option>
-                        <option value="en_revision">En Revisión</option>
-                        <option value="aprobada">Aprobada</option>
-                        <option value="rechazada">Rechazada</option>
-                    </select>
 
-                    <div id="contenedorObservaciones" class="d-none mt-3">
-                        <label for="updateObservaciones" class="form-label fw-semibold">
-                            Observaciones <span class="text-muted fw-normal">(Opcional)</span>
+                    <div class="mb-3">
+                        <label for="updateEstado" class="detail-label mb-1">
+                            <i class="bi bi-circle-fill"></i>Nuevo Estado <span class="text-danger">*</span>
+                        </label>
+                        <select id="updateEstado" class="form-select" required>
+                            <option value="pendiente">Pendiente</option>
+                            <option value="en_revision">En Revisión</option>
+                            <option value="aprobada">Aprobada</option>
+                            <option value="rechazada">Rechazada</option>
+                        </select>
+                    </div>
+
+                    <div id="contenedorObservaciones" class="d-none">
+                        <label for="updateObservaciones" class="detail-label mb-1">
+                            <i class="bi bi-chat-left-dots"></i>Observaciones <span class="text-muted fw-normal" style="text-transform:none;letter-spacing:0;">(Opcional)</span>
                         </label>
                         <textarea id="updateObservaciones" class="form-control" rows="3"
                             placeholder="Indique un motivo al estudiante..." maxlength="2000"></textarea>
@@ -204,11 +215,11 @@
 <div class="modal fade" id="modalDetalle" tabindex="-1" aria-labelledby="modalDetalleLabel">
     <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header bg-primary">
                 <h5 class="modal-title" id="modalDetalleLabel">
-                    <i class="bi bi-file-text me-2 text-primary"></i>Detalle de Solicitud
+                    <i class="bi bi-file-text me-2"></i>Detalle de Solicitud
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"
                     onclick="this.blur()"></button>
             </div>
             <div class="modal-body" id="detalleContenido"></div>

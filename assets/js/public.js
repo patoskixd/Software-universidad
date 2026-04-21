@@ -72,7 +72,8 @@ async function consultarSolicitudes(e) {
         const data = await res.json();
 
         if (!res.ok) {
-            contenedor.innerHTML = `<div class="alert alert-danger">${escapeHtml(data.error ?? 'Error al consultar.')}</div>`;
+            contenedor.innerHTML = '';
+            mostrarAlerta('danger', data.error ?? 'Error al consultar.');
             return;
         }
 
@@ -101,7 +102,7 @@ async function consultarSolicitudes(e) {
                 <td>${escapeHtml(labelTipo(s.tipo_solicitud))}</td>
                 <td><span title="${escapeHtml(s.descripcion || '')}" style="cursor:help;">${escapeHtml(descCorta)}</span></td>
                 <td>${badgeEstado(s.estado)}</td>
-                <td class="text-muted small">${formatFecha(s.fecha_creacion)}</td>
+                <td class="text-muted small">${formatFecha(s.fecha_actualizacion || s.fecha_creacion)}</td>
                 <td class="text-muted small">
                     ${s.observaciones
                         ? `<span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle" title="${escapeHtml(s.observaciones)}" style="cursor:help;max-width:100px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
@@ -135,29 +136,27 @@ async function consultarSolicitudes(e) {
         });
 
         contenedor.innerHTML = `
-            <!-- Vista de Escritorio -->
-            <div class="table-responsive d-none d-md-block">
-                <table class="table table-hover align-middle mb-0" style="font-size:.9rem;">
-                    <thead>
-                        <tr>
-                            <th>Tipo</th>
-                            <th>Descripción</th>
-                            <th>Estado</th>
-                            <th>Fecha creación</th>
-                            <th>Observaciones</th>
-                            <th>Acción</th>
-                        </tr>
-                    </thead>
-                    <tbody>${filasEscritorio}</tbody>
-                </table>
-            </div>
-            
-            <!-- Vista Móvil (Tarjetas) -->
-            <div class="d-md-none bg-white rounded-bottom">
-                ${filasMovil}
+            <div class="border-top">
+                <div class="table-responsive d-none d-md-block">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th class="ps-3">Tipo</th>
+                                <th>Descripción</th>
+                                <th>Estado</th>
+                                <th>Últ. actualización</th>
+                                <th>Observaciones</th>
+                                <th class="text-center pe-3">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>${filasEscritorio}</tbody>
+                    </table>
+                </div>
+                <div class="d-md-none">${filasMovil}</div>
             </div>`;
     } catch (_) {
-        contenedor.innerHTML = `<div class="alert alert-danger">No se pudo conectar. Intente más tarde.</div>`;
+        contenedor.innerHTML = '';
+        mostrarAlerta('danger', 'No se pudo conectar. Intente más tarde.');
     } finally {
         btn.disabled = false;
         btn.innerHTML = '<i class="bi bi-search me-1"></i> Buscar';
@@ -172,9 +171,9 @@ document.addEventListener('DOMContentLoaded', () => {
 window.verDescripcionCompleta = function (btn) {
     const s = JSON.parse(decodeURIComponent(btn.getAttribute('data-json')));
 
-    document.getElementById('modalDetalleTipo').innerHTML = escapeHtml(labelTipo(s.tipo_solicitud));
-    document.getElementById('modalDetalleSolicitante').textContent = escapeHtml(s.nombre_solicitante || '');
-    document.getElementById('modalDetalleCorreo').textContent = escapeHtml(s.correo_electronico || '');
+    document.getElementById('modalDetalleTipo').textContent = labelTipo(s.tipo_solicitud);
+    document.getElementById('modalDetalleSolicitante').textContent = s.nombre_solicitante || '';
+    document.getElementById('modalDetalleCorreo').textContent = s.correo_electronico || '';
     document.getElementById('modalDetalleEstado').innerHTML = badgeEstado(s.estado);
     document.getElementById('modalDetalleFecha').textContent = s.fecha_creacion ? formatFecha(s.fecha_creacion) : '-';
     document.getElementById('modalDetalleFechaMod').textContent = s.fecha_actualizacion ? formatFecha(s.fecha_actualizacion) : 'Sin modificaciones recientes';

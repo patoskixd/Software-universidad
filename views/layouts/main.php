@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($pageTitle ?? 'Sistema de Solicitudes') ?> – Universidad</title>
+    <title><?= htmlspecialchars($pageTitle ?? 'UniGest') ?> – UniGest</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -20,6 +20,8 @@
     <?php if (class_exists('Csrf')): ?>
         <meta name="csrf-token" content="<?= Csrf::token() ?>">
     <?php endif; ?>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="icon" type="image/png" href="logo.png">
 </head>
 <body>
 
@@ -33,13 +35,10 @@
 
         <div class="container-fluid px-4" style="position:relative;z-index:1;">
             <a class="navbar-brand mb-0 h1 text-decoration-none d-flex align-items-center gap-2" href="index.php">
-                <!-- SVG mortarboard inline -->
-                <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
-                    <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/>
-                </svg>
+                <img src="favicon.svg" alt="UniGest" width="34" height="34" style="flex-shrink:0;">
                 <span>
-                    Sistema de Solicitudes
-                    <span class="d-none d-md-inline fw-light" style="opacity:.6;"> · Universidad</span>
+                    Uni<span class="brand-dot">Gest</span>
+                    <span class="d-none d-md-inline fw-light" style="opacity:.55;font-size:.85em;"> · Plataforma Administrativa</span>
                 </span>
             </a>
 
@@ -67,7 +66,7 @@
         </div>
     </nav>
 
-    <main class="container my-4">
+    <main class="container my-2">
         <?= $content ?>
     </main>
 
@@ -75,11 +74,11 @@
 
     <footer class="site-footer mt-auto">
         <div class="container-fluid px-4 d-flex flex-column flex-sm-row justify-content-between align-items-center gap-1">
-            <span>
-                <i class="bi bi-mortarboard-fill me-1"></i>
-                Sistema de Solicitudes Administrativas
+            <span class="d-flex align-items-center">
+                <img src="favicon.svg" alt="" width="24" height="24" style="flex-shrink:0;" class="me-1">
+                Uni<span class="brand-dot">Gest</span> — Plataforma Administrativa Universitaria
             </span>
-            <span><?= date('Y') ?> · Desarrollado para uso institucional</span>
+            <span>© <?= date('Y') ?> · Uso institucional exclusivo</span>
         </div>
     </footer>
 
