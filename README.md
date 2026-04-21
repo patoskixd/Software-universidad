@@ -9,6 +9,7 @@ Sistema web para el registro, consulta y gestión de solicitudes administrativas
 - PHP 8.1 o superior
 - MySQL (incluido en XAMPP)
 - Apache (incluido en XAMPP)
+
 ---
 
 ## Instrucciones de ejecución
@@ -16,7 +17,7 @@ Sistema web para el registro, consulta y gestión de solicitudes administrativas
 ### 1. Clonar el repositorio
 
 ```bash
-git clone <url-repositorio> software-universidad
+git clone https://github.com/patoskixd/Software-universidad
 ```
 
 Colocar la carpeta en `C:/xampp/htdocs/` (o el directorio raíz del servidor).
@@ -30,6 +31,7 @@ source database/migrations/001_initial_schema.sql
 source database/migrations/002_administrativos.sql
 source database/migrations/003_login_attempts.sql
 source database/migrations/004_add_observaciones.sql
+source database/migrations/005_add_ip_solicitante.sql
 ```
 
 ### 3. Configurar conexión
@@ -61,14 +63,14 @@ return [
 | `http://localhost/software-universidad/` | Formulario público |
 | `http://localhost/software-universidad/login.php` | Acceso administrativo |
 
-**Credenciales de administrador por defecto:**
+**Credenciales de administrador por defecto (solo entorno local):**
 
 ```
 Correo:    admin@universidad.cl
 Contraseña: admin123
 ```
 
-> Se recomienda cambiar la contraseña en producción.
+> Estas credenciales son únicamente para desarrollo y evaluación local. Deben cambiarse antes de cualquier despliegue en un entorno real.
 
 ---
 
@@ -86,13 +88,13 @@ software-universidad/
 │   │   ├── Csrf.php             # Protección CSRF
 │   │   ├── Database.php         # Singleton de conexión PDO
 │   │   ├── Middleware.php       # Ejecución de capas de seguridad
-│   │   ├── RateLimit.php        # Límite de intentos de login
+│   │   ├── RateLimit.php        # Límite de intentos (login y solicitudes públicas)
 │   │   └── Response.php         # Respuestas JSON estandarizadas
 │   └── models/
 │       ├── Administrativo.php   # Autenticación de administradores
 │       └── Solicitud.php        # CRUD y validación de solicitudes
 ├── assets/
-│   ├── css/style.css
+│   ├── css/style.css            # Estilos globales y paleta de colores
 │   └── js/
 │       ├── main.js              # Lógica del panel admin
 │       ├── public.js            # Lógica del formulario público
@@ -106,17 +108,19 @@ software-universidad/
 │       ├── 001_initial_schema.sql
 │       ├── 002_administrativos.sql
 │       ├── 003_login_attempts.sql
-│       └── 004_add_observaciones.sql
+│       ├── 004_add_observaciones.sql
+│       └── 005_add_ip_solicitante.sql
 ├── views/
-│   ├── auth/login.php
+│   ├── auth/login.php           # Vista del formulario de autenticación
 │   ├── layouts/main.php         # Layout compartido
 │   ├── public/index.php         # Vista del formulario público
 │   └── request/index.php        # Vista del panel administrativo
 ├── .htaccess                    # Cabeceras de seguridad HTTP
-├── admin.php
-├── index.php
-├── login.php
-└── logout.php
+├── favicon.svg                  # Ícono de la aplicación
+├── admin.php                    # Redirige al panel administrativo
+├── index.php                    # Redirige al formulario público
+├── login.php                    # Maneja autenticación y sesión del administrador
+└── logout.php                   # Cierra sesión y redirige al login
 ```
 
 ---
@@ -143,7 +147,7 @@ software-universidad/
 
 ### Arquitectura MVC simplificada
 
-Se optó por una arquitectura MVC sin framework para cumplir el requerimiento de PHP puro, manteniendo separación clara entre modelos, controladores y vistas. Esto facilita la legibilidad y el mantenimiento sin añadir dependencias externas.
+Se optó por una arquitectura MVC sin framework para cumplir el requerimiento de PHP puro, manteniendo separación clara entre modelos, controladores y vistas sin añadir dependencias externas.
 
 ### API REST con un único endpoint
 
@@ -155,23 +159,27 @@ Todas las consultas usan sentencias preparadas con PDO, eliminando la posibilida
 
 ### Protección CSRF
 
-Los formularios HTML incluyen un token oculto y las peticiones AJAX lo envían en el header `X-CSRF-Token`. La validación usa `hash_equals()` para evitar timing attacks (comparación de strings que se detiene al primer caracter diferente, lo que puede revelar información).
+Los formularios HTML incluyen un token oculto y las peticiones AJAX lo envían en el header `X-CSRF-Token`. La validación usa `hash_equals()` para evitar timing attacks.
 
 ### Rate limiting en login
 
-Se registra cada intento fallido en la tabla `login_attempts` con IP y timestamp. Si se superan 5 intentos en 10 minutos, se bloquea el acceso temporalmente. Esto mitiga ataques de fuerza bruta sin necesidad de dependencias externas.
+Se registra cada intento fallido en la tabla `login_attempts`. Si se superan 5 intentos en 10 minutos por IP, se bloquea el acceso temporalmente. Al hacer login exitoso se ejecuta un `cleanup()` que elimina registros vencidos, evitando crecimiento indefinido de la tabla.
+
+### Rate limiting en solicitudes públicas
+
+El endpoint de creación de solicitudes limita a 10 solicitudes por minuto por IP. La IP se almacena en la columna `ip_solicitante` de la tabla `solicitudes` y se consulta directamente para verificar el límite. Si se supera, el servidor responde con HTTP 429.
 
 ### Contraseñas con bcrypt
 
-Las contraseñas de administradores se almacenan con `password_hash()` usando el algoritmo bcrypt, verificadas con `password_verify()`.
+Las contraseñas de administradores se almacenan con `password_hash()` usando bcrypt, verificadas con `password_verify()`.
 
 ### Paginación del lado del servidor
 
-El listado de solicitudes usa `LIMIT` y `OFFSET` en SQL. El total se obtiene con `COUNT(*)`. Esto evita cargar registros innecesarios en memoria cuando el volumen crece.
+El listado usa `LIMIT` y `OFFSET` en SQL con un valor por defecto de 10 registros por página y un máximo de 100 (`min(100, $limit)`), evitando consultas que devuelvan volúmenes arbitrarios de datos.
 
 ### Exportación Excel con UTF-16LE
 
-Se genera un archivo TSV (separado por tabulaciones) con BOM UTF-16LE, que Excel reconoce y abre correctamente con todos los caracteres especiales del español.
+Se genera un archivo `.csv` con separador de tabulación (TSV) y BOM UTF-16LE que Excel reconoce y abre correctamente con caracteres especiales del español.
 
 ### Cabeceras de seguridad HTTP
 
@@ -184,33 +192,46 @@ Referrer-Policy: same-origin      → Limita información del referer
 Permissions-Policy                 → Deshabilita cámara, micrófono y geolocalización
 ```
 
+### Máquina de estados para solicitudes
+
+Las transiciones de estado siguen reglas estrictas: `pendiente` y `en_revision` permiten avanzar a cualquier estado, mientras que `aprobada` y `rechazada` son **estados finales** que no admiten modificaciones posteriores. Si se intenta una transición inválida.
+
 ### Validación en dos capas
 
-Toda entrada se valida en el frontend (UX inmediato) y en el servidor (seguridad real). La validación del servidor incluye: longitud máxima, formato de correo con `FILTER_VALIDATE_EMAIL`, regex Unicode para nombres (`/^[\p{L}\p{M}\s\'\-\.]+$/u`) y whitelist de valores permitidos para enumeraciones.
+Toda entrada se valida en el frontend  y en el servidor. La validación del servidor incluye longitud máxima, formato de correo con `FILTER_VALIDATE_EMAIL`, regex Unicode para nombres y whitelist de valores permitidos para enumeraciones.
 
 ---
 
 ## Supuestos realizados
 
-- Un mismo correo puede registrar múltiples solicitudes (no hay autenticación de solicitantes).
-- Las observaciones del administrador solo se registran al aprobar o rechazar una solicitud.
-- El sistema opera en una red interna; no se implementó HTTPS (se delega al servidor web institucional).
-- No se requirió un sistema de roles múltiples; existe un único perfil de administrador.
+- Un mismo correo puede registrar múltiples solicitudes, no se requiere autenticación del solicitante.
+- Las observaciones del administrador son opcionales y solo se persisten cuando el estado final es "Aprobada" o "Rechazada".
+- El correo electrónico se normaliza a minúsculas al crear una solicitud y al consultar por correo, permitiendo búsquedas insensibles a mayúsculas/minúsculas.
+- Las solicitudes no pueden eliminarse, no existe operación de borrado y el historial es permanente.
+- El sistema opera en red interna, no se implementó HTTPS.
+- No se requirió un sistema de roles múltiples, existe un único perfil de administrador.
 
 ---
 
 ## Limitaciones conocidas
 
-- **Sin notificaciones por correo**: el sistema no envía emails al solicitante cuando su solicitud cambia de estado. La funcionalidad estaba contemplada y podría implementarse con PHPMailer disparando el envío en `SolicitudController::updateEstado()`, enviando una plantilla HTML con el nuevo estado y las observaciones del administrador.
-- **Sin gestión de administradores desde la interfaz**: agregar o eliminar administradores requiere acceso directo a la base de datos.
-- **Rate limiting por IP**: en redes con NAT, un bloqueo por IP afectaría a todos los usuarios detrás de la misma IP pública.
-- **Sin HTTPS forzado**: se asume que el servidor de producción maneja SSL a nivel de infraestructura.
+- **Consulta pública sin verificación de identidad**: cualquier persona que conozca el correo electrónico de un solicitante puede ver sus solicitudes y su estado. Podría mitigarse con un token de consulta enviado al correo al momento de registrar la solicitud.
+- **Sin notificaciones por correo**: el sistema no envía emails al solicitante cuando su solicitud cambia de estado. Podría implementarse con PHPMailer.
+- **Sin gestión de administradores desde la interfaz**: agregar o eliminar administradores requiere acceso directo a la base de datos. Podría resolverse con un panel CRUD protegido por el mismo sistema de autenticación.
+- **Rate limiting por IP con NAT**: en redes donde varios usuarios comparten la misma IP pública, un bloqueo por IP afectaría a todos simultáneamente. Podría complementarse con rate limiting por sesión o usuario autenticado.
+- **Sin HTTPS forzado**: se asume que el servidor de producción maneja el certificado SSL a nivel de infraestructura.
+- **CORS abierto**: el header `Access-Control-Allow-Origin: *` permite peticiones desde cualquier dominio. En producción debería restringirse al dominio institucional.
+- **Sin recuperación de contraseña**: el administrador no puede restablecer su contraseña desde la interfaz. Requiere acceso directo a la base de datos para actualizarla manualmente. Podría implementarse con un flujo de recuperación vía correo electrónico.
 
 ---
 
 ## Mejoras posibles
 
 - Notificación por correo al actualizar estado (PHPMailer + plantilla HTML)
+- Envío de token de consulta al correo del solicitante al registrar una solicitud, reemplazando la consulta pública abierta por una verificada
+- Recuperación de contraseña para administradores mediante enlace enviado al correo
 - Panel de gestión de administradores desde la interfaz
 - Adjuntar archivos a las solicitudes
 - Historial de cambios de estado por solicitud
+- Autenticación de solicitantes para seguimiento personalizado
+- Restricción de CORS al dominio institucional en producción
