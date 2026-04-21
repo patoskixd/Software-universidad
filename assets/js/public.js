@@ -47,7 +47,7 @@ async function enviarSolicitud(e) {
         }
 
         form.reset();
-        mostrarAlerta('success', 'Solicitud enviada correctamente. Recibirá respuesta en su correo.');
+        mostrarAlerta('success', 'Solicitud enviada correctamente. Puede consultar el estado usando su correo electrónico.');
     } catch (_) {
         mostrarAlerta('danger', 'No se pudo enviar la solicitud. Intente más tarde.');
     } finally {
