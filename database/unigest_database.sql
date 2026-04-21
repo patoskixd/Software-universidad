@@ -9,7 +9,6 @@ CREATE DATABASE IF NOT EXISTS sistema_universidad
 
 USE sistema_universidad;
 
--
 -- Tabla: solicitudes
 
 CREATE TABLE IF NOT EXISTS solicitudes (
